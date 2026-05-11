@@ -18,7 +18,8 @@ if (Get-Module -ListAvailable -Name posh-git) {
 }
 
 # --- PSFzf (Ctrl-T file, Alt-C dir) ------------------------------------------
-if (Get-Module -ListAvailable -Name PSFzf) {
+# Guard on the fzf binary too: PSFzf's Import-Module throws if fzf isn't on PATH.
+if ((Get-Module -ListAvailable -Name PSFzf) -and (Get-Command fzf -ErrorAction SilentlyContinue)) {
     Import-Module PSFzf
     Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
 }
