@@ -21,6 +21,24 @@ foreach ($p in $devPkgs) {
 {{- end }}
 
 {{ if eq .profile "full" -}}
+# --- full profile: power-user CLI extras -------------------------------------
+# Map scoop package -> binary name (often the same; ripgrep ships as `rg`).
+$fullCliPkgs = @{
+    "fd"      = "fd"
+    "ripgrep" = "rg"
+    "fzf"     = "fzf"
+    "delta"   = "delta"
+    "atuin"   = "atuin"
+}
+foreach ($pkg in $fullCliPkgs.Keys) {
+    if (Get-Command $fullCliPkgs[$pkg] -ErrorAction SilentlyContinue) {
+        Write-Host "✓ $pkg"
+    } else {
+        Write-Host "==> scoop install $pkg"
+        scoop install $pkg
+    }
+}
+
 # --- full profile: TeX Live (basic) + Clash Verge (GUI installer) -----------
 if (-not (Get-Command latex -ErrorAction SilentlyContinue)) {
     Write-Host "==> scoop install miktex"

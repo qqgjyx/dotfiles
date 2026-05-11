@@ -38,6 +38,25 @@ fi
 {{- end }}
 
 {{ if eq .profile "full" -}}
+# --- full profile: power-user CLI extras -------------------------------------
+{{- if eq .chezmoi.os "darwin" }}
+for p in fd ripgrep fzf git-delta atuin; do
+    brew list --formula 2>/dev/null | grep -qx "$p" || brew install "$p"
+done
+{{- else if eq .chezmoi.os "linux" }}
+# Linux full CLI extras: best-effort. Coverage varies by distro.
+if have apt-get; then
+    sudo apt-get install -y fd-find ripgrep fzf git-delta
+    # atuin: no apt package; defer to upstream installer if not present
+    have atuin || curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+elif have dnf; then
+    sudo dnf install -y fd-find ripgrep fzf git-delta
+    have atuin || curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+elif have pacman; then
+    sudo pacman -S --noconfirm fd ripgrep fzf git-delta atuin
+fi
+{{- end }}
+
 # --- full profile: TeX Live (basic) + Clash Verge ----------------------------
 {{- if eq .chezmoi.os "darwin" }}
 brew list --cask 2>/dev/null | grep -qx basictex   || brew install --cask basictex

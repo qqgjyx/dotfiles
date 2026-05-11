@@ -38,7 +38,9 @@ scoop bucket add main 2>$null | Out-Null
 scoop bucket add extras 2>$null | Out-Null
 scoop bucket add nerd-fonts 2>$null | Out-Null
 
-# 4. Core packages — package manager + chezmoi + gh + shell stack + CLI utilities
+# 4. Core packages — what every profile gets. Power-user CLI extras
+# (fd, ripgrep, fzf, delta, atuin) are profile-gated and install via
+# run_onchange_install-packages.ps1.tmpl when profile=full.
 $packages = @(
     "git",        # required for chezmoi
     "pwsh",       # PowerShell 7 — the actual daily shell
@@ -47,12 +49,7 @@ $packages = @(
     "starship",   # prompt
     "eza",        # ls replacement
     "bat",        # cat replacement
-    "fd",         # find replacement
-    "ripgrep",    # grep replacement
-    "fzf",        # fuzzy finder
-    "zoxide",     # smarter cd
-    "delta",      # git diff pager
-    "atuin"       # shell history
+    "zoxide"      # smarter cd
 )
 
 foreach ($p in $packages) {
