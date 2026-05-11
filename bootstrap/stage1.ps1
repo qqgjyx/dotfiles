@@ -63,6 +63,30 @@ foreach ($p in $packages) {
     }
 }
 
+# 5. PowerShell modules — needed by Documents\PowerShell profile.
+# First-use of PSGallery prompts for the NuGet provider interactively, so we
+# install it up front, then trust the gallery, then install the three modules
+# the profile expects. Idempotent: re-run-safe.
+Write-Host "==> PowerShell modules (NuGet provider + PSGallery)"
+
+$nuget = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
+if (-not $nuget -or $nuget.Version -lt [version]"2.8.5.201") {
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Scope CurrentUser -Force | Out-Null
+}
+
+if ((Get-PSRepository -Name PSGallery).InstallationPolicy -ne "Trusted") {
+    Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+}
+
+foreach ($m in @("PSReadLine", "posh-git", "PSFzf")) {
+    if (-not (Get-Module -ListAvailable -Name $m)) {
+        Write-Host "==> Install-Module $m"
+        Install-Module $m -Scope CurrentUser -Force -AllowClobber
+    } else {
+        Write-Host "✓ $m"
+    }
+}
+
 Write-Host ""
 Write-Host "================================================================"
 Write-Host "Stage 1 complete."
