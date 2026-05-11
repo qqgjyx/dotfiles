@@ -258,6 +258,20 @@ Skip if you can't accept reduced AV coverage on those paths. The script prints r
 
 ---
 
+## Optional: Windows inbound SSH (for Tailscale clients)
+
+Tailscale SSH server is **not supported on Windows** (`tailscale set --ssh=true` errors with "The Tailscale SSH server is not supported on windows"). To accept SSH inbound from your tailnet on a Windows box, install Win32-OpenSSH. Tailscale's tunnel still routes the traffic over the 100.x.y.z address; sshd answers it.
+
+`bootstrap/install-openssh-server.ps1` installs Win32-OpenSSH via scoop (not via `Add-WindowsCapability` — the FoD path is unreliable on Home China editions, fails with DISM/CBS `0x80070002`). Same upstream codebase, no FoD dependency. It also drops the IFEO RedirectionGuard mitigation that `install-sshd.ps1` adds (incompatible with scoop's symlinked install path — crashes sshd on launch with `STATUS_REDIRECTION_GUARD_VIOLATION`), copies `sshd_config`, generates host keys, repairs ACLs, opens the firewall on TCP 22, sets default SSH shell to pwsh, clears Tailscale's RunSSH no-op, and prints pubkey-paste instructions. Requires admin:
+
+```powershell
+Start-Process pwsh -Verb RunAs -ArgumentList '-NoProfile','-File',(Resolve-Path .\bootstrap\install-openssh-server.ps1).Path
+```
+
+Then paste your client's pubkey into `C:\ProgramData\ssh\administrators_authorized_keys` (Windows OpenSSH quirk: admin users use the system file, not `~/.ssh/authorized_keys`). The script prints the exact `icacls` to lock the file down.
+
+---
+
 ## Intentionally not included
 
 Skip-list with reasons (re-evaluate when the need is real):
