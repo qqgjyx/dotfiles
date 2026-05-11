@@ -2,7 +2,8 @@
 [user]
 	name = {{ .name | quote }}
 	email = {{ .email | quote }}
-{{- /* SSH commit signing — only active if the key exists (gates downstream) */ }}
+
+# SSH commit signing — only active if the ed25519 public key exists on this machine
 {{- if stat (joinPath .chezmoi.homeDir ".ssh" "id_ed25519.pub") }}
 	signingkey = {{ joinPath .chezmoi.homeDir ".ssh" "id_ed25519.pub" | quote }}
 
