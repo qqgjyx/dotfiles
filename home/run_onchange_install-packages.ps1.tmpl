@@ -11,13 +11,14 @@ $ErrorActionPreference = "Continue"
 
 {{ if eq .profile "dev" -}}
 # --- dev profile: Mosh + Tailscale -------------------------------------------
-$devPkgs = @("mosh", "tailscale")
-foreach ($p in $devPkgs) {
-    if (-not (Get-Command $p -ErrorAction SilentlyContinue)) {
-        Write-Host "==> scoop install $p"
-        scoop install $p
-    }
-}
+# Both fail to install via scoop in chezmoi's -NoProfile child:
+#   mosh:      no scoop manifest exists (mosh is unix-side; use WSL on Windows)
+#   tailscale: scoop install errors on Get-FileHash inside the -NoProfile child
+#              shell ("URL is not valid" downstream noise is misleading)
+# Print clear manual-install pointers instead of attempting and failing.
+Write-Host "dev profile (Windows): mosh + tailscale must be installed manually:"
+Write-Host "  - mosh:      run from WSL (e.g. 'wsl sudo apt install mosh')"
+Write-Host "  - tailscale: https://tailscale.com/download/windows"
 {{- end }}
 
 {{ if eq .profile "full" -}}
