@@ -8,7 +8,12 @@
 # no admin needed. Elevation is only required if execution policy is restricted.
 
 #Requires -Version 5.1
-$ErrorActionPreference = "Stop"
+
+# Note: do NOT set $ErrorActionPreference = "Stop". In PowerShell 5.1, that
+# wraps every native-command stderr line in a terminating ErrorRecord, so
+# benign output (e.g. scoop's progress writes) aborts the script.
+# Check $LASTEXITCODE explicitly where it matters instead.
+$ErrorActionPreference = "Continue"
 
 function Test-Cmd { param([string]$Name) [bool](Get-Command $Name -ErrorAction SilentlyContinue) }
 

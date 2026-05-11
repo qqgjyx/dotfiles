@@ -9,9 +9,22 @@
 #   - gh auth login completed (run between stage1 and stage2)
 
 #Requires -Version 5.1
-$ErrorActionPreference = "Stop"
+
+# Note: do NOT set $ErrorActionPreference = "Stop". In PowerShell 5.1, that
+# wraps every native-command stderr line in a terminating ErrorRecord, so
+# benign output like `gh repo clone`'s "Cloning into..." aborts the script.
+# Check $LASTEXITCODE explicitly where it matters instead.
+$ErrorActionPreference = "Continue"
 
 function Test-Cmd { param([string]$Name) [bool](Get-Command $Name -ErrorAction SilentlyContinue) }
+
+function Assert-Exit {
+    param([string]$What)
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "$What failed (exit $LASTEXITCODE)"
+        exit $LASTEXITCODE
+    }
+}
 
 # Pre-flight
 foreach ($tool in @("gh", "chezmoi", "git")) {
@@ -35,6 +48,7 @@ if (-not (Test-Path $skills_dir)) {
     Write-Host "==> Cloning qqgjyx/skills to $skills_dir"
     New-Item -ItemType Directory -Force -Path (Split-Path $skills_dir) | Out-Null
     gh repo clone qqgjyx/skills $skills_dir
+    Assert-Exit "gh repo clone qqgjyx/skills"
 } else {
     Write-Host "✓ skills already cloned at $skills_dir"
 }
@@ -42,6 +56,7 @@ if (-not (Test-Path $skills_dir)) {
 if (-not (Test-Path $sshcfg_dir)) {
     Write-Host "==> Cloning qqgjyx/ssh-config to $sshcfg_dir"
     gh repo clone qqgjyx/ssh-config $sshcfg_dir
+    Assert-Exit "gh repo clone qqgjyx/ssh-config"
     Write-Host "  (review $sshcfg_dir\README for ~/.ssh/config wiring)"
 } else {
     Write-Host "✓ ssh-config already cloned at $sshcfg_dir"
@@ -71,6 +86,7 @@ if (-not (Test-Path (Join-Path $source ".chezmoiroot"))) {
 
 Write-Host "==> chezmoi init --apply --source `"$source`""
 chezmoi init --apply --source "$source"
+Assert-Exit "chezmoi init --apply"
 
 Write-Host ""
 Write-Host "================================================================"
