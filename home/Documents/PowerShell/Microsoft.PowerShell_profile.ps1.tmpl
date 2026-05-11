@@ -52,6 +52,13 @@ function cma { chezmoi apply @args }
 function cmd { chezmoi diff @args }
 function cme { chezmoi edit @args }
 # git short
+# PowerShell ships built-in aliases (e.g. gp -> Get-ItemProperty) that resolve
+# before user-defined functions. Drop the conflicts before defining ours.
+foreach ($_n in @('gp')) {
+    if (Get-Alias $_n -ErrorAction SilentlyContinue) {
+        Remove-Item -Path "Alias:$_n" -Force -ErrorAction SilentlyContinue
+    }
+}
 function gs { git status --short --branch }
 function gp { git pull --ff-only }
 
