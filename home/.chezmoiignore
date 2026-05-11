@@ -1,13 +1,16 @@
-{{- /* OS-conditional skip rules — one if/else, target paths listed under each OS. */ -}}
+{{- /* OS-conditional skip rules. Patterns match TARGET paths — for run_onchange
+       scripts, the target name is the script filename WITHOUT the run_onchange_
+       prefix. */ -}}
 {{- if eq .chezmoi.os "windows" }}
 .zshrc
 .bashrc
+.zsh_plugins.txt
 .config/atuin/**
 .zsh/**
-run_onchange_install-cursor.sh
-run_onchange_install-packages.sh
+install-cursor.sh
+install-packages.sh
 {{- else }}
 Documents/PowerShell/**
-run_onchange_install-cursor.ps1
-run_onchange_install-packages.ps1
+install-cursor.ps1
+install-packages.ps1
 {{- end }}
