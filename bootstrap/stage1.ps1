@@ -33,9 +33,10 @@ if (-not (Test-Cmd "scoop")) {
     Write-Host "scoop already installed"
 }
 
-# 3. Buckets — main is default; extras for less-common tools
+# 3. Buckets — main is default; extras for less-common tools; nerd-fonts for JetBrainsMono-NF
 scoop bucket add main 2>$null | Out-Null
 scoop bucket add extras 2>$null | Out-Null
+scoop bucket add nerd-fonts 2>$null | Out-Null
 
 # 4. Core packages — package manager + chezmoi + gh + shell stack + CLI utilities
 $packages = @(
@@ -61,6 +62,16 @@ foreach ($p in $packages) {
         Write-Host "==> scoop install $p"
         scoop install $p
     }
+}
+
+# 4b. JetBrains Mono Nerd Font — required by starship glyphs and by the Cursor
+# editor/terminal fontFamily. Detected via scoop apps dir (not Get-Command,
+# since fonts aren't on PATH).
+if (-not (Test-Path "$HOME\scoop\apps\JetBrainsMono-NF\current")) {
+    Write-Host "==> scoop install nerd-fonts/JetBrainsMono-NF"
+    scoop install nerd-fonts/JetBrainsMono-NF
+} else {
+    Write-Host "✓ JetBrainsMono-NF"
 }
 
 # 5. PowerShell modules — needed by Documents\PowerShell profile.
