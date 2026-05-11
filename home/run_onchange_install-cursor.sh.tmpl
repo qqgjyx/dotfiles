@@ -1,11 +1,10 @@
-{{- /* run_onchange — POSIX Cursor install.
-       Linux: canonical already at ~/.config/Cursor/User, no-op copy.
-       macOS: copy to ~/Library/Application Support/Cursor/User. */ -}}
+{{- /* POSIX Cursor install — mirror settings to the OS-specific Cursor User dir
+       (canonical lives at ~/.config/Cursor/User; macOS needs ~/Library copy),
+       then install extensions for the active profile. */ -}}
 #!/usr/bin/env bash
 set -euo pipefail
 
 CANONICAL="$HOME/.config/Cursor/User"
-
 {{ if eq .chezmoi.os "darwin" -}}
 TARGET="$HOME/Library/Application Support/Cursor/User"
 {{- else -}}
@@ -13,31 +12,24 @@ TARGET="$CANONICAL"
 {{- end }}
 
 mkdir -p "$TARGET"
-
 if [ "$CANONICAL" != "$TARGET" ]; then
     for f in settings.json keybindings.json; do
-        if [ -f "$CANONICAL/$f" ]; then
-            cp -f "$CANONICAL/$f" "$TARGET/$f"
-            echo "Mirrored $f -> $TARGET/$f"
-        fi
+        [ -f "$CANONICAL/$f" ] && cp -f "$CANONICAL/$f" "$TARGET/$f"
     done
 fi
 
-if command -v cursor >/dev/null 2>&1; then
-    extensions=(
-{{- range .cursor.extensions.base }}
-        "{{ . }}"
-{{- end }}
-{{- if eq .profile "full" }}
-{{- range .cursor.extensions.full }}
-        "{{ . }}"
-{{- end }}
-{{- end }}
-    )
-    for ext in "${extensions[@]}"; do
-        echo "cursor --install-extension $ext"
-        cursor --install-extension "$ext"
-    done
-else
-    echo "Warning: cursor CLI not on PATH — install Cursor and re-run 'chezmoi apply'." >&2
+if ! command -v cursor >/dev/null 2>&1; then
+    echo "cursor CLI not on PATH — install Cursor and re-run 'chezmoi apply'." >&2
+    exit 0
 fi
+
+while IFS= read -r ext; do
+    [ -n "$ext" ] && cursor --install-extension "$ext"
+done <<'EOF'
+{{- range .cursor.extensions.base }}
+{{ . }}
+{{- end }}
+{{- if eq .profile "full" }}{{- range .cursor.extensions.full }}
+{{ . }}
+{{- end }}{{- end }}
+EOF
