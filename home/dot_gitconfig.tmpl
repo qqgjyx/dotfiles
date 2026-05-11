@@ -1,0 +1,79 @@
+{{- /* ~/.gitconfig — templated from .chezmoi.toml prompts */ -}}
+[user]
+	name = {{ .name | quote }}
+	email = {{ .email | quote }}
+{{- /* SSH commit signing — only active if the key exists (gates downstream) */ }}
+{{- if stat (joinPath .chezmoi.homeDir ".ssh" "id_ed25519.pub") }}
+	signingkey = {{ joinPath .chezmoi.homeDir ".ssh" "id_ed25519.pub" | quote }}
+
+[gpg]
+	format = ssh
+
+[commit]
+	gpgsign = true
+
+[tag]
+	gpgsign = true
+{{- end }}
+
+[init]
+	defaultBranch = main
+
+[push]
+	default = simple
+	autoSetupRemote = true
+
+[pull]
+	rebase = false
+	ff = only
+
+[fetch]
+	prune = true
+
+[rebase]
+	autoStash = true
+	autoSquash = true
+
+[merge]
+	conflictstyle = zdiff3
+
+[diff]
+	algorithm = histogram
+	colorMoved = default
+
+[core]
+	autocrlf = input
+	eol = lf
+	excludesfile = {{ joinPath .chezmoi.homeDir ".gitignore_global" | quote }}
+{{- if lookPath "delta" }}
+	pager = delta
+{{- end }}
+
+[interactive]
+{{- if lookPath "delta" }}
+	diffFilter = delta --color-only
+{{- end }}
+
+[delta]
+	side-by-side = true
+	line-numbers = true
+	syntax-theme = Catppuccin-mocha
+	navigate = true
+
+[alias]
+	lg = log --graph --pretty=format:'%C(yellow)%h%C(reset) %C(green)%an%C(reset) %C(cyan)%ar%C(reset)%C(auto)%d%C(reset) %s' --abbrev-commit
+	last = log -1 HEAD --stat
+	amend = commit --amend --no-edit
+	undo = reset --soft HEAD~1
+
+[help]
+	autocorrect = prompt
+
+[rerere]
+	enabled = true
+
+[column]
+	ui = auto
+
+[branch]
+	sort = -committerdate
