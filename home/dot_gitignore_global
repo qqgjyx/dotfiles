@@ -1,0 +1,37 @@
+# Global gitignore — referenced from gitconfig via core.excludesfile if desired,
+# or set explicitly: git config --global core.excludesfile ~/.gitignore_global
+
+# --- OS noise ---------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# --- Editor noise -----------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Local environment / direnv ---------------------------------------------
+.env.local
+.envrc.local
+.direnv/
+
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# --- Node -------------------------------------------------------------------
+node_modules/
+
+# --- General build artifacts -----------------------------------------------
+dist/
+build/
+*.log

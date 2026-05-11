@@ -1,0 +1,15 @@
+{
+  "editor.fontFamily": "JetBrainsMono Nerd Font, 'Microsoft YaHei', 'PingFang SC', sans-serif",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+  "editor.tabSize": 4,
+  "editor.minimap.enabled": false,
+  "editor.formatOnSave": false,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.eol": "\n",
+  "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font, 'Microsoft YaHei', 'PingFang SC', sans-serif",
+  "workbench.colorTheme": "Catppuccin Mocha",
+  "workbench.iconTheme": "catppuccin-mocha",
+  "telemetry.telemetryLevel": "off"
+}

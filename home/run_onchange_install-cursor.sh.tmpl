@@ -1,0 +1,43 @@
+{{- /* run_onchange — POSIX Cursor install.
+       Linux: canonical already at ~/.config/Cursor/User, no-op copy.
+       macOS: copy to ~/Library/Application Support/Cursor/User. */ -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+CANONICAL="$HOME/.config/Cursor/User"
+
+{{ if eq .chezmoi.os "darwin" -}}
+TARGET="$HOME/Library/Application Support/Cursor/User"
+{{- else -}}
+TARGET="$CANONICAL"
+{{- end }}
+
+mkdir -p "$TARGET"
+
+if [ "$CANONICAL" != "$TARGET" ]; then
+    for f in settings.json keybindings.json; do
+        if [ -f "$CANONICAL/$f" ]; then
+            cp -f "$CANONICAL/$f" "$TARGET/$f"
+            echo "Mirrored $f -> $TARGET/$f"
+        fi
+    done
+fi
+
+if command -v cursor >/dev/null 2>&1; then
+    extensions=(
+{{- range .cursor.extensions.base }}
+        "{{ . }}"
+{{- end }}
+{{- if eq .profile "full" }}
+{{- range .cursor.extensions.full }}
+        "{{ . }}"
+{{- end }}
+{{- end }}
+    )
+    for ext in "${extensions[@]}"; do
+        echo "cursor --install-extension $ext"
+        cursor --install-extension "$ext"
+    done
+else
+    echo "Warning: cursor CLI not on PATH — install Cursor and re-run 'chezmoi apply'." >&2
+fi

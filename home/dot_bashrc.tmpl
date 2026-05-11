@@ -1,0 +1,28 @@
+{{- /* ~/.bashrc — minimal bash entry point. zsh is the daily shell on POSIX. */ -}}
+# vim:ft=bash
+
+# Skip non-interactive shells
+case $- in *i*) ;; *) return ;; esac
+
+# --- History -----------------------------------------------------------------
+HISTSIZE=100000
+HISTFILESIZE=200000
+HISTCONTROL=ignoreboth:erasedups
+shopt -s histappend
+
+# --- PATH --------------------------------------------------------------------
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$HOME/bin:$PATH" ;;
+esac
+
+# --- Shared aliases ----------------------------------------------------------
+[[ -f "$HOME/.zsh/aliases.sh" ]] && source "$HOME/.zsh/aliases.sh"
+
+# --- Tool init ---------------------------------------------------------------
+command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
+command -v zoxide   >/dev/null 2>&1 && eval "$(zoxide init bash --cmd z)"
+command -v atuin    >/dev/null 2>&1 && eval "$(atuin init bash --disable-up-arrow)"
+
+# --- Local overrides ---------------------------------------------------------
+[[ -f "$HOME/.bashrc.local" ]] && source "$HOME/.bashrc.local"

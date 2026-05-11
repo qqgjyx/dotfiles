@@ -1,0 +1,38 @@
+{{- /* Profile-conditional package install — Windows.
+       Re-runs when the rendered output of this template changes (i.e. when the
+       profile or package list changes). Stage1 handles the core CLI stack; this
+       script only adds PSGallery modules + dev/full profile extras. */ -}}
+# Profile: {{ .profile }}
+
+$ErrorActionPreference = "Stop"
+
+# --- PSGallery modules used by the PowerShell profile ------------------------
+$psModules = @("PSReadLine", "posh-git", "PSFzf")
+foreach ($m in $psModules) {
+    if (-not (Get-Module -ListAvailable -Name $m)) {
+        Write-Host "==> Install-Module $m"
+        Install-Module -Name $m -Scope CurrentUser -Force -AllowClobber
+    }
+}
+
+{{ if eq .profile "dev" -}}
+# --- dev profile: Mosh + Tailscale -------------------------------------------
+$devPkgs = @("mosh", "tailscale")
+foreach ($p in $devPkgs) {
+    if (-not (Get-Command $p -ErrorAction SilentlyContinue)) {
+        Write-Host "==> scoop install $p"
+        scoop install $p
+    }
+}
+{{- end }}
+
+{{ if eq .profile "full" -}}
+# --- full profile: TeX Live (basic) + Clash Verge (GUI installer) -----------
+if (-not (Get-Command latex -ErrorAction SilentlyContinue)) {
+    Write-Host "==> scoop install miktex"
+    scoop install miktex
+}
+if (-not (Get-Command clash-verge -ErrorAction SilentlyContinue)) {
+    Write-Warning "Clash Verge: install manually from https://github.com/clash-verge-rev/clash-verge-rev/releases (no scoop manifest)."
+}
+{{- end }}

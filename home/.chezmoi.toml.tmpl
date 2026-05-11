@@ -1,0 +1,14 @@
+{{- /*
+    .chezmoi.toml.tmpl — runs once on `chezmoi init` to generate
+    ~/.config/chezmoi/chezmoi.toml for this machine. Prompts for name,
+    email, install profile.
+*/ -}}
+
+{{- $name    := promptStringOnce . "name"    "Name"  "Juntang" -}}
+{{- $email   := promptStringOnce . "email"   "Email" "150919274+qqgjyx@users.noreply.github.com" -}}
+{{- $profile := promptStringOnce . "profile" "Install profile (core|dev|full)" "core" -}}
+
+[data]
+    name    = {{ $name    | quote }}
+    email   = {{ $email   | quote }}
+    profile = {{ $profile | quote }}
