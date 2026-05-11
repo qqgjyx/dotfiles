@@ -20,10 +20,13 @@ install_macos() {
         # shellcheck disable=SC2046
         eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shellenv)"
     fi
+    # Core packages — every profile gets these. Power-user CLI extras
+    # (fd, ripgrep, fzf, git-delta, atuin) are profile-gated and install via
+    # run_onchange_install-packages.sh.tmpl when profile=full.
     local pkgs=(
         zsh git curl
         chezmoi gh starship
-        eza bat fd ripgrep fzf zoxide git-delta atuin
+        eza bat zoxide
     )
     for p in "${pkgs[@]}"; do
         if brew list --formula 2>/dev/null | grep -qx "$p"; then
