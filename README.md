@@ -246,6 +246,18 @@ Per-machine overrides go in `*.local` sibling files (never committed):
 
 ---
 
+## Optional: Windows perf tuning
+
+`bootstrap/dev-defender-exclusions.ps1` adds Windows Defender exclusions for `~/scoop`, the cached init dir, and the PowerShell modules dir. Cuts AV scanning of script loads on every shell start (~100-300ms typical). Requires admin; run once per machine:
+
+```powershell
+Start-Process pwsh -Verb RunAs -ArgumentList '-NoProfile','-File',(Resolve-Path .\bootstrap\dev-defender-exclusions.ps1).Path
+```
+
+Skip if you can't accept reduced AV coverage on those paths. The script prints reversal commands at the end.
+
+---
+
 ## Intentionally not included
 
 Skip-list with reasons (re-evaluate when the need is real):
