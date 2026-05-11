@@ -26,10 +26,20 @@
 $ErrorActionPreference = "Stop"
 
 # 1. OpenSSH Server capability ------------------------------------------------
-$cap = Get-WindowsCapability -Online -Name OpenSSH.Server*
-if ($cap.State -ne "Installed") {
-    Write-Host "==> Add-WindowsCapability OpenSSH.Server"
-    Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0 | Out-Null
+# Use dism.exe instead of Get-WindowsCapability / Add-WindowsCapability:
+# those cmdlets rely on COM classes that aren't always registered for the
+# pwsh 7 host on Windows 11 Home variants (fails with "Class not registered"
+# / "没有注册类"). dism.exe is the underlying tool and works in any shell.
+$dismProbe = & dism.exe /Online /Get-CapabilityInfo `
+    /CapabilityName:OpenSSH.Server~~~~0.0.1.0 2>&1
+$installed = ($dismProbe -join "`n") -match "State\s*:\s*Installed"
+if (-not $installed) {
+    Write-Host "==> dism /Online /Add-Capability OpenSSH.Server"
+    & dism.exe /Online /Add-Capability `
+        /CapabilityName:OpenSSH.Server~~~~0.0.1.0 /NoRestart
+    if ($LASTEXITCODE -ne 0) {
+        throw "dism /Add-Capability failed (exit $LASTEXITCODE)"
+    }
 } else {
     Write-Host "+ OpenSSH.Server already installed"
 }
