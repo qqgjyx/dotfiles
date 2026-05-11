@@ -47,8 +47,15 @@ jobs:
           exit "$fail"
 
   apply:
-    name: chezmoi apply --dry-run (ubuntu)
-    runs-on: ubuntu-latest
+    name: chezmoi apply --dry-run (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
 
