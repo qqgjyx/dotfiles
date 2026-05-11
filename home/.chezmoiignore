@@ -9,4 +9,7 @@ Documents/PowerShell/**
 .bashrc
 .config/atuin/**
 .zsh/**
+run_onchange_install-cursor.sh
+{{- else }}
+run_onchange_install-cursor.ps1
 {{- end }}

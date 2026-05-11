@@ -1,0 +1,44 @@
+{{- /* run_onchange — re-runs when this rendered template changes.
+       Mirrors canonical settings to %APPDATA%\Cursor\User\, then installs
+       all base extensions (+ LaTeX Workshop on the 'full' profile). */ -}}
+# Cursor cross-platform install — Windows
+
+$ErrorActionPreference = "Stop"
+
+$Canonical = Join-Path $HOME ".config\Cursor\User"
+$Target    = Join-Path $env:APPDATA "Cursor\User"
+
+if (-not (Test-Path $Target)) {
+    New-Item -ItemType Directory -Force -Path $Target | Out-Null
+}
+
+foreach ($f in @("settings.json", "keybindings.json")) {
+    $src = Join-Path $Canonical $f
+    $dst = Join-Path $Target $f
+    if (Test-Path $src) {
+        Copy-Item -Force $src $dst
+        Write-Host "Mirrored $f -> $dst"
+    }
+}
+
+# Install extensions if `cursor` CLI is available
+if (Get-Command cursor -ErrorAction SilentlyContinue) {
+    $extensions = @(
+{{- range .cursor.extensions.base }}
+        "{{ . }}",
+{{- end }}
+{{- if eq .profile "full" }}
+{{- range .cursor.extensions.full }}
+        "{{ . }}",
+{{- end }}
+{{- end }}
+        $null
+    ) | Where-Object { $_ -ne $null }
+
+    foreach ($ext in $extensions) {
+        Write-Host "cursor --install-extension $ext"
+        & cursor --install-extension $ext
+    }
+} else {
+    Write-Warning "cursor CLI not on PATH — install Cursor and re-run 'chezmoi apply'."
+}
