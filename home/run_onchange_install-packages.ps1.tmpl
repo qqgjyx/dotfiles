@@ -1,19 +1,13 @@
 {{- /* Profile-conditional package install — Windows.
        Re-runs when the rendered output of this template changes (i.e. when the
-       profile or package list changes). Stage1 handles the core CLI stack; this
-       script only adds PSGallery modules + dev/full profile extras. */ -}}
+       profile or package list changes). Stage1 handles the core CLI stack +
+       PSGallery modules; this script only adds dev/full profile scoop extras.
+       PSGallery modules are NOT installed here because chezmoi spawns
+       powershell with -NoProfile and on a fresh box PowerShellGet 1.0.0.1
+       cannot bootstrap NuGet without the user session's full module path. */ -}}
 # Profile: {{ .profile }}
 
-$ErrorActionPreference = "Stop"
-
-# --- PSGallery modules used by the PowerShell profile ------------------------
-$psModules = @("PSReadLine", "posh-git", "PSFzf")
-foreach ($m in $psModules) {
-    if (-not (Get-Module -ListAvailable -Name $m)) {
-        Write-Host "==> Install-Module $m"
-        Install-Module -Name $m -Scope CurrentUser -Force -AllowClobber
-    }
-}
+$ErrorActionPreference = "Continue"
 
 {{ if eq .profile "dev" -}}
 # --- dev profile: Mosh + Tailscale -------------------------------------------
