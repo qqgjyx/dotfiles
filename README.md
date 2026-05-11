@@ -258,6 +258,20 @@ Skip if you can't accept reduced AV coverage on those paths. The script prints r
 
 ---
 
+## Optional: Windows inbound SSH (for Tailscale clients)
+
+Tailscale SSH server is **not supported on Windows** (`tailscale set --ssh=true` errors with "The Tailscale SSH server is not supported on windows"). To accept SSH inbound from your tailnet on a Windows box, install the built-in Windows OpenSSH Server. Tailscale's tunnel still routes the traffic over the 100.x.y.z address; sshd answers it.
+
+`bootstrap/install-openssh-server.ps1` installs `OpenSSH.Server`, starts/enables sshd, ensures the firewall rule, sets default SSH shell to pwsh, and prints pubkey-paste instructions. Requires admin:
+
+```powershell
+Start-Process pwsh -Verb RunAs -ArgumentList '-NoProfile','-File',(Resolve-Path .\bootstrap\install-openssh-server.ps1).Path
+```
+
+Then paste your client's pubkey into `C:\ProgramData\ssh\administrators_authorized_keys` (Windows OpenSSH quirk: admin users use the system file, not `~/.ssh/authorized_keys`). The script prints the exact `icacls` to lock the file down.
+
+---
+
 ## Intentionally not included
 
 Skip-list with reasons (re-evaluate when the need is real):
