@@ -12,7 +12,7 @@ foreach ($f in "settings.json", "keybindings.json") {
 }
 
 if (-not (Get-Command cursor -ErrorAction SilentlyContinue)) {
-    Write-Warning "cursor CLI not on PATH — install Cursor and re-run 'chezmoi apply'."
+    Write-Warning "cursor CLI not on PATH - install Cursor and re-run 'chezmoi apply'."
     return
 }
 
