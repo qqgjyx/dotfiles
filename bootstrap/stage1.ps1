@@ -86,7 +86,7 @@ if ((Get-PSRepository -Name PSGallery).InstallationPolicy -ne "Trusted") {
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 }
 
-foreach ($m in @("PSReadLine", "posh-git", "PSFzf")) {
+foreach ($m in @("PSReadLine", "posh-git")) {
     if (-not (Get-Module -ListAvailable -Name $m)) {
         Write-Host "==> Install-Module $m"
         Install-Module $m -Scope CurrentUser -Force -AllowClobber
