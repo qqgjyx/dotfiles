@@ -1,0 +1,12 @@
+{{- /* Skip Windows-only paths when not on Windows */ -}}
+{{- if ne .chezmoi.os "windows" }}
+Documents/PowerShell/**
+{{- end }}
+
+{{- /* Skip POSIX shell rc files on Windows (PowerShell is the shell there) */ -}}
+{{- if eq .chezmoi.os "windows" }}
+.zshrc
+.bashrc
+.config/atuin/**
+.zsh/**
+{{- end }}

@@ -2,3 +2,7 @@
 *.bak
 .DS_Store
 Thumbs.db
+
+# chezmoi-managed local state
+.chezmoistate
+.chezmoiscripts/
