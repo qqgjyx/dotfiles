@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # ~/.zsh/aliases.sh — sourced from both .zshrc and .bashrc.
 # Curated ~15 aliases. Modern CLI replacements gate on presence.
 

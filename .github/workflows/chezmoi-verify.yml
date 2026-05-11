@@ -39,6 +39,9 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           fail=0
           while IFS= read -r tmpl; do
+              # .chezmoi.toml.tmpl uses promptStringOnce — only valid in 'chezmoi init' context,
+              # not execute-template. Skipped here; covered by the apply --dry-run job.
+              case "$tmpl" in *.chezmoi.toml.tmpl) continue ;; esac
               if ! chezmoi execute-template --source="$GITHUB_WORKSPACE" < "$tmpl" > /dev/null; then
                   echo "::error file=$tmpl::template parse failed"
                   fail=1
