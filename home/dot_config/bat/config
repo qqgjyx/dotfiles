@@ -1,0 +1,14 @@
+# bat config — Catppuccin Mocha theme.
+# If the theme isn't listed by `bat --list-themes`, install it:
+#   mkdir -p "$(bat --config-dir)/themes"
+#   curl -fsSL https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Mocha.tmTheme \
+#     -o "$(bat --config-dir)/themes/Catppuccin Mocha.tmTheme"
+#   bat cache --build
+
+--theme="Catppuccin Mocha"
+
+# Show line numbers, decorations, and git changes alongside content
+--style="numbers,changes,header,grid"
+
+# Use less as pager (delta handles diffs separately via gitconfig)
+--paging=auto

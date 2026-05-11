@@ -1,0 +1,9 @@
+# ~/.ripgreprc — sourced by ripgrep automatically when RIPGREP_CONFIG_PATH points here,
+# or via XDG/dotfile default discovery on recent rg versions.
+
+--smart-case
+--hidden
+--glob=!.git/*
+--glob=!node_modules/*
+--max-columns=200
+--max-columns-preview
