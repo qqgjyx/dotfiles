@@ -13,8 +13,15 @@ if (Get-Module -ListAvailable -Name PSReadLine) {
 }
 
 # --- posh-git (git integration in prompt + tab completion) -------------------
+# `Import-Module posh-git` is ~390ms cold — by far the heaviest item in this
+# profile. Defer until the user actually runs git: stub a `git` function that,
+# on first call, removes itself, imports posh-git, and re-invokes git for real.
 if (Get-Module -ListAvailable -Name posh-git) {
-    Import-Module posh-git
+    function global:git {
+        Remove-Item Function:git -Force
+        Import-Module posh-git
+        & git @args
+    }
 }
 
 # --- PSFzf (Ctrl-T file, Alt-C dir) ------------------------------------------
@@ -24,17 +31,36 @@ if ((Get-Module -ListAvailable -Name PSFzf) -and (Get-Command fzf -ErrorAction S
     Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
 }
 
-# --- Tool init ---------------------------------------------------------------
-if (Get-Command starship -ErrorAction SilentlyContinue) {
-    Invoke-Expression (& starship init powershell)
+# --- Tool init (cached) -----------------------------------------------------
+# `& <tool> init powershell` spawns a subprocess on every shell start.
+# Cache the rendered init script to disk; refresh only when the binary's
+# mtime is newer than the cache. Saves ~150ms per shell.
+function _UseCachedInit {
+    param([string]$Tool, [string[]]$InitArgs, [string]$CacheDir)
+    $bin = Get-Command $Tool -ErrorAction SilentlyContinue
+    if (-not $bin) { return }
+    $cache = Join-Path $CacheDir "$Tool.ps1"
+    $stale = (-not (Test-Path $cache)) -or `
+             ((Get-Item $bin.Source).LastWriteTimeUtc -gt (Get-Item $cache).LastWriteTimeUtc)
+    if ($stale) {
+        & $Tool @InitArgs | Set-Content -Path $cache -Encoding UTF8NoBOM
+    }
+    . $cache
 }
-if (Get-Command zoxide -ErrorAction SilentlyContinue) {
-    Invoke-Expression (& { (zoxide init powershell --cmd z) -join "`n" })
+
+$_initCacheDir = Join-Path $HOME '.cache\powershell-init'
+if (-not (Test-Path $_initCacheDir)) {
+    New-Item -ItemType Directory -Force -Path $_initCacheDir | Out-Null
 }
+
+# starship's plain `init powershell` returns a one-line stub that calls
+# `--print-full-init` at runtime. Cache the full init so we save *both* hops.
+_UseCachedInit -Tool 'starship' -InitArgs @('init','powershell','--print-full-init')      -CacheDir $_initCacheDir
+_UseCachedInit -Tool 'zoxide'   -InitArgs @('init','powershell','--cmd','z')              -CacheDir $_initCacheDir
 if (Get-Command atuin -ErrorAction SilentlyContinue) {
     $env:ATUIN_CONFIG_DIR = "$HOME\.config\atuin"
-    Invoke-Expression (& atuin init powershell --disable-up-arrow | Out-String)
 }
+_UseCachedInit -Tool 'atuin'    -InitArgs @('init','powershell','--disable-up-arrow')     -CacheDir $_initCacheDir
 
 # --- Aliases -----------------------------------------------------------------
 # eza
