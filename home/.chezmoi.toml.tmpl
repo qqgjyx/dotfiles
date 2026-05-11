@@ -12,3 +12,11 @@
     name    = {{ $name    | quote }}
     email   = {{ $email   | quote }}
     profile = {{ $profile | quote }}
+{{ if eq .chezmoi.os "windows" }}
+# chezmoi spawns powershell.exe as a child for .ps1 run_onchange scripts;
+# the child inherits Machine-scope execution policy, which is Restricted on
+# many locked-down boxes. Bypass scoped to chezmoi-invoked scripts only.
+[interpreters.ps1]
+    command = "powershell"
+    args    = ["-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass"]
+{{- end }}
