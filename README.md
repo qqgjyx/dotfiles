@@ -23,6 +23,9 @@ dotfiles/
 
 **Windows** (PowerShell as Administrator):
 ```powershell
+# First time on a new machine: allow local .ps1 scripts (default policy is Restricted).
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned    # answer Y once
+
 cd $HOME\dotfiles
 .\bootstrap.ps1
 ```
