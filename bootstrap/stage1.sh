@@ -33,6 +33,16 @@ install_macos() {
             brew install "$p"
         fi
     done
+
+    # JetBrains Mono Nerd Font — required by starship glyphs and the Cursor fontFamily.
+    # Cask, not formula; idempotency check via `brew list --cask`.
+    local font_cask="font-jetbrains-mono-nerd-font"
+    if brew list --cask 2>/dev/null | grep -qx "$font_cask"; then
+        echo "✓ $font_cask"
+    else
+        log "brew install --cask $font_cask"
+        brew install --cask "$font_cask"
+    fi
 }
 
 install_linux() {
