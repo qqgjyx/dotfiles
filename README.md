@@ -4,6 +4,56 @@ Personal cross-platform configuration for [@qqgjyx](https://github.com/qqgjyx) �
 
 Targets: **Windows 11** (current daily driver) · **macOS** · **Linux**
 
+<details>
+<summary>🤖 <strong>Agent onboarding prompt</strong> — paste this into Claude Code / Codex / any coding agent on a fresh machine</summary>
+
+````
+You are bootstrapping qqgjyx/dotfiles on a fresh machine. This is a
+chezmoi-managed cross-platform config (Windows / macOS / Linux) with
+two bootstrap stages and three profiles (core | dev | full).
+
+Tasks, in order:
+
+1. Confirm with the user: install profile (default: core) and git
+   identity (name + email). Don't pick silently.
+
+2. Clone the repo if not present:
+     git clone https://github.com/qqgjyx/dotfiles ~/dotfiles
+
+3. Run stage 1 — installs the package manager, CLI stack, chezmoi, gh.
+   Idempotent; safe on partially-bootstrapped boxes.
+     ~/dotfiles/bootstrap/stage1.sh           # POSIX
+     ~/dotfiles/bootstrap/stage1.ps1          # Windows (pwsh / powershell)
+
+4. Ask the user to run interactively:  gh auth login
+
+5. Pre-flight before stage 2 — back up anything chezmoi will overwrite
+   that the user has hand-edited:
+     ~/.gitconfig
+     ~/.claude/CLAUDE.md
+     ~/.claude/settings.json
+   If ~/.ssh/id_ed25519 already exists, do NOT generate a new key —
+   stage2 will skip the prompt.
+
+6. Run stage 2 — clones private repos (~/.claude/skills,
+   ~/.ssh-config-private) and runs chezmoi init --apply:
+     ~/dotfiles/bootstrap/stage2.sh
+     ~/dotfiles/bootstrap/stage2.ps1
+
+7. Verify:
+     chezmoi diff       # must be empty
+     chezmoi verify     # must exit 0
+   Open a fresh shell, confirm prompt + ll/la/lt + gs/gp aliases.
+
+Rules:
+- Stop on first unexpected error. Paste the exact error; don't retry blindly.
+- Don't change ExecutionPolicy beyond what stage1 already sets, don't
+  overwrite ~/.gitconfig identity, don't overwrite SSH keys.
+- Known frictions are tracked in GitHub Issues — search before debugging.
+````
+
+</details>
+
 ---
 
 ## Quick start
