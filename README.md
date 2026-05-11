@@ -134,37 +134,45 @@ Pick at `chezmoi init` prompt (changeable later via `chezmoi edit-config`).
 
 ## Layout
 
+Top level:
+
 ```
 dotfiles/
 ├── .chezmoiroot                  # points source root to ./home
 ├── LICENSE                       # MIT
-├── README.md                     # you are here
 ├── .github/workflows/            # chezmoi-verify CI
-├── bootstrap/
-│   ├── stage1.{sh,ps1}           # package mgr + chezmoi + core CLI
-│   └── stage2.{sh,ps1}           # private repos + chezmoi init --apply
-└── home/                         # chezmoi source state
-    ├── .chezmoi.toml.tmpl        # prompts for name/email/profile on init
-    ├── .chezmoidata.toml         # static data (theme, extensions list)
-    ├── .chezmoiignore            # OS-conditional skip rules
-    ├── .chezmoiversion           # minimum chezmoi version
-    ├── dot_zshrc.tmpl            # → ~/.zshrc
-    ├── dot_bashrc.tmpl           # → ~/.bashrc
-    ├── dot_gitconfig.tmpl        # → ~/.gitconfig
-    ├── dot_gitignore_global      # → ~/.gitignore_global
-    ├── dot_ripgreprc             # → ~/.ripgreprc
-    ├── dot_zsh_plugins.txt       # antidote bundle list
-    ├── private_dot_zsh/aliases.sh
-    ├── dot_config/
-    │   ├── starship.toml
-    │   ├── atuin/config.toml
-    │   ├── bat/config
-    │   └── Cursor/User/{settings,keybindings}.json
-    ├── dot_claude/{CLAUDE.md, settings.json}
-    ├── Documents/PowerShell/Microsoft.PowerShell_profile.ps1.tmpl
-    ├── run_onchange_install-cursor.{sh,ps1}.tmpl
-    └── run_onchange_install-packages.{sh,ps1}.tmpl
+├── bootstrap/{stage1,stage2}.{sh,ps1}
+└── home/                         # chezmoi source state (see below)
 ```
+
+<details>
+<summary><strong>home/</strong> source state — full tree</summary>
+
+```
+home/
+├── .chezmoi.toml.tmpl            # prompts for name/email/profile on init
+├── .chezmoidata.toml             # static data (theme, extensions list)
+├── .chezmoiignore                # OS-conditional skip rules
+├── .chezmoiversion               # minimum chezmoi version
+├── dot_zshrc.tmpl                # → ~/.zshrc
+├── dot_bashrc.tmpl               # → ~/.bashrc
+├── dot_gitconfig.tmpl            # → ~/.gitconfig
+├── dot_gitignore_global          # → ~/.gitignore_global
+├── dot_ripgreprc                 # → ~/.ripgreprc
+├── dot_zsh_plugins.txt           # antidote bundle list
+├── private_dot_zsh/aliases.sh
+├── dot_config/
+│   ├── starship.toml
+│   ├── atuin/config.toml
+│   ├── bat/config
+│   └── Cursor/User/{settings,keybindings}.json
+├── dot_claude/{CLAUDE.md, settings.json}
+├── Documents/PowerShell/Microsoft.PowerShell_profile.ps1.tmpl
+├── run_onchange_install-cursor.{sh,ps1}.tmpl
+└── run_onchange_install-packages.{sh,ps1}.tmpl
+```
+
+</details>
 
 ---
 

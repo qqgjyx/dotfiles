@@ -1,9 +1,4 @@
-{{- /* Skip Windows-only paths when not on Windows */ -}}
-{{- if ne .chezmoi.os "windows" }}
-Documents/PowerShell/**
-{{- end }}
-
-{{- /* Skip POSIX shell rc files on Windows (PowerShell is the shell there) */ -}}
+{{- /* OS-conditional skip rules — one if/else, target paths listed under each OS. */ -}}
 {{- if eq .chezmoi.os "windows" }}
 .zshrc
 .bashrc
@@ -12,6 +7,7 @@ Documents/PowerShell/**
 run_onchange_install-cursor.sh
 run_onchange_install-packages.sh
 {{- else }}
+Documents/PowerShell/**
 run_onchange_install-cursor.ps1
 run_onchange_install-packages.ps1
 {{- end }}
