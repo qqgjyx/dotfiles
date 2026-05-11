@@ -7,8 +7,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  verify:
-    name: dry-run apply on Ubuntu
+  shellcheck:
+    name: shellcheck (bash)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: shellcheck bootstrap/stage1.sh bootstrap/stage2.sh home/private_dot_zsh/aliases.sh
+
+  parse:
+    name: per-template parse check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,7 +24,38 @@ jobs:
       - name: Install chezmoi
         run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
 
-      - name: Seed chezmoi data (skip interactive prompts)
+      - name: Seed chezmoi data
+        run: |
+          mkdir -p "$HOME/.config/chezmoi"
+          cat > "$HOME/.config/chezmoi/chezmoi.toml" <<'EOF'
+          [data]
+              name = "CI"
+              email = "ci@example.com"
+              profile = "core"
+          EOF
+
+      - name: chezmoi execute-template per .tmpl
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          fail=0
+          while IFS= read -r tmpl; do
+              if ! chezmoi execute-template --source="$GITHUB_WORKSPACE" < "$tmpl" > /dev/null; then
+                  echo "::error file=$tmpl::template parse failed"
+                  fail=1
+              fi
+          done < <(find home -name '*.tmpl' -type f)
+          exit "$fail"
+
+  apply:
+    name: chezmoi apply --dry-run (ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+
+      - name: Seed chezmoi data
         run: |
           mkdir -p "$HOME/.config/chezmoi"
           cat > "$HOME/.config/chezmoi/chezmoi.toml" <<'EOF'
