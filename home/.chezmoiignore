@@ -10,6 +10,8 @@ Documents/PowerShell/**
 .config/atuin/**
 .zsh/**
 run_onchange_install-cursor.sh
+run_onchange_install-packages.sh
 {{- else }}
 run_onchange_install-cursor.ps1
+run_onchange_install-packages.ps1
 {{- end }}

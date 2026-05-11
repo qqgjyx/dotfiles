@@ -1,0 +1,55 @@
+{{- /* Profile-conditional package install — POSIX.
+       Re-runs when the rendered template output changes. */ -}}
+#!/usr/bin/env bash
+# Profile: {{ .profile }}
+set -euo pipefail
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# --- antidote (zsh plugin manager) -------------------------------------------
+{{ if eq .chezmoi.os "darwin" -}}
+if ! brew list --formula | grep -qx antidote; then
+    brew install antidote
+fi
+{{- else if eq .chezmoi.os "linux" -}}
+if [ ! -d "$HOME/.antidote" ]; then
+    git clone --depth=1 https://github.com/mattmc3/antidote.git "$HOME/.antidote"
+fi
+{{- end }}
+
+{{ if eq .profile "dev" -}}
+# --- dev profile: Mosh + Tailscale -------------------------------------------
+{{- if eq .chezmoi.os "darwin" }}
+for p in mosh tailscale; do
+    brew list --formula 2>/dev/null | grep -qx "$p" || brew install "$p"
+done
+{{- else if eq .chezmoi.os "linux" }}
+if have apt-get; then
+    sudo apt-get install -y mosh
+    # Tailscale: official install script (apt repo)
+    have tailscale || curl -fsSL https://tailscale.com/install.sh | sh
+elif have dnf; then
+    sudo dnf install -y mosh
+    have tailscale || curl -fsSL https://tailscale.com/install.sh | sh
+elif have pacman; then
+    sudo pacman -S --noconfirm mosh tailscale
+fi
+{{- end }}
+{{- end }}
+
+{{ if eq .profile "full" -}}
+# --- full profile: TeX Live (basic) + Clash Verge ----------------------------
+{{- if eq .chezmoi.os "darwin" }}
+brew list --cask 2>/dev/null | grep -qx basictex   || brew install --cask basictex
+brew list --cask 2>/dev/null | grep -qx clash-verge || brew install --cask clash-verge
+{{- else if eq .chezmoi.os "linux" }}
+if have apt-get; then
+    sudo apt-get install -y texlive-base texlive-latex-recommended biber latexmk
+    echo "Clash Verge: install AppImage from https://github.com/clash-verge-rev/clash-verge-rev/releases" >&2
+elif have dnf; then
+    sudo dnf install -y texlive-scheme-basic biber latexmk
+elif have pacman; then
+    sudo pacman -S --noconfirm texlive-most texlive-bibtexextra biber clash-verge
+fi
+{{- end }}
+{{- end }}
