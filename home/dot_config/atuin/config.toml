@@ -1,0 +1,15 @@
+# atuin shell history config. Set ATUIN_CONFIG_DIR if not auto-detected.
+
+# Sync is enabled by default once `atuin register` / `atuin login` has been run.
+# To disable history sync, set `auto_sync = false`.
+auto_sync = true
+sync_frequency = "10m"
+sync_address = "https://api.atuin.sh"
+
+# Filter behavior: 'host' = only this machine; 'session' = current session;
+# 'global' = everywhere synced. Use 'host' by default; toggle with Ctrl-R again.
+filter_mode = "host"
+search_mode = "fuzzy"
+
+# Don't take over Up-arrow — Ctrl-R is the entry point.
+update_check = false

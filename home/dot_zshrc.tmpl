@@ -1,0 +1,46 @@
+{{- /* ~/.zshrc — zsh entry point for macOS/Linux */ -}}
+# vim:ft=zsh
+
+# --- History -----------------------------------------------------------------
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=1000000
+SAVEHIST=1000000
+setopt extended_history hist_expire_dups_first hist_ignore_dups
+setopt hist_ignore_space hist_verify inc_append_history share_history
+
+# --- PATH --------------------------------------------------------------------
+typeset -U path
+path=(
+    "$HOME/.local/bin"
+    "$HOME/bin"
+{{- if eq .chezmoi.os "darwin" }}
+    "/opt/homebrew/bin"
+    "/usr/local/bin"
+{{- end }}
+    $path
+)
+export PATH
+
+# --- Plugins (antidote) ------------------------------------------------------
+# antidote install: `brew install antidote` (mac) or `git clone --depth=1 https://github.com/mattmc3/antidote $HOME/.antidote` (linux)
+if [[ -e "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/antidote/share/antidote/antidote.zsh" ]]; then
+    source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/antidote/share/antidote/antidote.zsh"
+elif [[ -e "$HOME/.antidote/antidote.zsh" ]]; then
+    source "$HOME/.antidote/antidote.zsh"
+fi
+command -v antidote >/dev/null 2>&1 && antidote load "$HOME/.zsh_plugins.txt"
+
+# --- Shared aliases ----------------------------------------------------------
+[[ -f "$HOME/.zsh/aliases.sh" ]] && source "$HOME/.zsh/aliases.sh"
+
+# --- Tool init ---------------------------------------------------------------
+command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+command -v zoxide   >/dev/null 2>&1 && eval "$(zoxide init zsh --cmd z)"
+command -v fzf      >/dev/null 2>&1 && {
+    [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]] && source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
+    [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]] && source /usr/share/doc/fzf/examples/key-bindings.zsh
+}
+command -v atuin    >/dev/null 2>&1 && eval "$(atuin init zsh --disable-up-arrow)"
+
+# --- Local overrides ---------------------------------------------------------
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

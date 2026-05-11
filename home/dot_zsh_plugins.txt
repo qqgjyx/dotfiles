@@ -1,0 +1,7 @@
+# antidote bundle list — loaded by ~/.zshrc.
+# Order matters: completions BEFORE syntax-highlighting; suggestions LAST.
+
+zsh-users/zsh-completions
+Aloxaf/fzf-tab
+zsh-users/zsh-syntax-highlighting
+zsh-users/zsh-autosuggestions
