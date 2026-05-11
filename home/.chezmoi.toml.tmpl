@@ -8,6 +8,11 @@
 {{- $email   := promptStringOnce . "email"   "Email" "150919274+qqgjyx@users.noreply.github.com" -}}
 {{- $profile := promptStringOnce . "profile" "Install profile (core|dev|full)" "core" -}}
 
+# Persist the source directory so plain `chezmoi diff/verify/apply` work
+# after bootstrap. stage2 passes --source as a one-shot CLI flag; without
+# this, chezmoi falls back to ~/.local/share/chezmoi which doesn't exist.
+sourceDir = {{ joinPath .chezmoi.homeDir "dotfiles" | quote }}
+
 [data]
     name    = {{ $name    | quote }}
     email   = {{ $email   | quote }}
