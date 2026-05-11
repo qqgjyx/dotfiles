@@ -1,0 +1,26 @@
+# Static data shared across all machines. Per-machine vars live in
+# ~/.config/chezmoi/chezmoi.toml (generated from .chezmoi.toml.tmpl on init).
+
+[theme]
+    name = "Catppuccin Mocha"
+    bat  = "Catppuccin-mocha"
+
+# Cursor extensions, by profile. Templates reference .cursor.extensions.<profile>.
+[cursor.extensions]
+    base = [
+        "catppuccin.catppuccin-vsc",
+        "catppuccin.catppuccin-vsc-icons",
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "ms-toolsai.jupyter",
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        "alefragnani.project-manager",
+        "usernamehw.errorlens",
+        "editorconfig.editorconfig",
+        "yzhang.markdown-all-in-one",
+        "gruntfuggly.todo-tree",
+        "streetsidesoftware.code-spell-checker",
+        "MS-CEINTL.vscode-language-pack-zh-hans",
+    ]
+    full = ["james-yu.latex-workshop"]
