@@ -4,6 +4,13 @@
 # against the existing ~/dotfiles checkout. Optionally generates an ed25519
 # SSH key if one isn't present.
 #
+# Authoring-box mode for SSH config: if you have qqgjyx/_ssh-config already
+# checked out (e.g. on OneDrive-synced project storage), set
+#   $env:SSH_CONFIG_REPO_DIR = "D:\OneDrive\Documents\_Projects\_ssh-config"
+# before running stage2. It'll junction ~/.ssh-config-working -> that path
+# instead of cloning a second copy to ~/.ssh-config-private. An already-
+# existing junction at ~/.ssh-config-working is also left untouched.
+#
 # Prerequisites:
 #   - stage1.ps1 completed (chezmoi, gh, pwsh available)
 #   - gh auth login completed (run between stage1 and stage2)
@@ -53,7 +60,20 @@ if (-not (Test-Path $skills_dir)) {
     Write-Host "✓ skills already cloned at $skills_dir"
 }
 
-if (-not (Test-Path $sshcfg_dir)) {
+$sshcfg_link = Join-Path $HOME ".ssh-config-working"
+$existing_junction = (Test-Path $sshcfg_link) -and ((Get-Item $sshcfg_link -Force).LinkType -eq 'Junction')
+$env_target = if ($env:SSH_CONFIG_REPO_DIR -and (Test-Path $env:SSH_CONFIG_REPO_DIR)) { $env:SSH_CONFIG_REPO_DIR } else { $null }
+$include_hint = ($sshcfg_link -replace '\\','/')
+
+if ($existing_junction) {
+    Write-Host "✓ junction $sshcfg_link -> $((Get-Item $sshcfg_link -Force).Target) (left as-is)"
+    Write-Host "  ~/.ssh/config should: Include $include_hint/config"
+} elseif ($env_target) {
+    Write-Host "==> SSH_CONFIG_REPO_DIR set; junctioning $sshcfg_link -> $env_target"
+    cmd /c mklink /J "$sshcfg_link" "$env_target" | Out-Null
+    Assert-Exit "mklink /J $sshcfg_link"
+    Write-Host "  ~/.ssh/config should: Include $include_hint/config"
+} elseif (-not (Test-Path $sshcfg_dir)) {
     Write-Host "==> Cloning qqgjyx/_ssh-config to $sshcfg_dir"
     gh repo clone qqgjyx/_ssh-config $sshcfg_dir
     Assert-Exit "gh repo clone qqgjyx/_ssh-config"
