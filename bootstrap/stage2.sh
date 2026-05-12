@@ -5,6 +5,13 @@
 # against the existing ~/dotfiles checkout. Optionally generates an ed25519
 # SSH key if one isn't present.
 #
+# Authoring-box mode for SSH config: if you have qqgjyx/_ssh-config already
+# checked out (e.g. on shared project storage), export
+#   SSH_CONFIG_REPO_DIR=/path/to/_ssh-config
+# before running stage2. It'll symlink ~/.ssh-config-working -> that path
+# instead of cloning a second copy to ~/.ssh-config-private. An already-
+# existing symlink at ~/.ssh-config-working is also left untouched.
+#
 # Prerequisites:
 #   - stage1.sh completed (chezmoi, gh available)
 #   - gh auth login completed (run between stage1 and stage2)
@@ -33,7 +40,16 @@ else
     echo "✓ skills already cloned at $SKILLS_DIR"
 fi
 
-if [ ! -d "$SSHCFG_DIR" ]; then
+SSHCFG_LINK="$HOME/.ssh-config-working"
+
+if [ -L "$SSHCFG_LINK" ] && [ -d "$SSHCFG_LINK" ]; then
+    echo "✓ symlink $SSHCFG_LINK -> $(readlink "$SSHCFG_LINK") (left as-is)"
+    echo "  ~/.ssh/config should: Include $SSHCFG_LINK/config"
+elif [ -n "${SSH_CONFIG_REPO_DIR:-}" ] && [ -d "$SSH_CONFIG_REPO_DIR" ]; then
+    log "SSH_CONFIG_REPO_DIR set; symlinking $SSHCFG_LINK -> $SSH_CONFIG_REPO_DIR"
+    ln -s "$SSH_CONFIG_REPO_DIR" "$SSHCFG_LINK"
+    echo "  ~/.ssh/config should: Include $SSHCFG_LINK/config"
+elif [ ! -d "$SSHCFG_DIR" ]; then
     log "Cloning qqgjyx/_ssh-config to $SSHCFG_DIR"
     gh repo clone qqgjyx/_ssh-config "$SSHCFG_DIR"
     echo "  (review $SSHCFG_DIR/README for ~/.ssh/config wiring)"
