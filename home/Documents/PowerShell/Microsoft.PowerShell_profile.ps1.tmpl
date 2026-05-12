@@ -63,11 +63,16 @@ _UseCachedInit -Tool 'atuin'    -InitArgs @('init','powershell','--disable-up-ar
 {{- end }}
 
 # --- Aliases -----------------------------------------------------------------
-# eza
+# eza — `ll` is the all-purpose long lister (always includes hidden); `la`
+# aliases to it for muscle memory. `lt` is a tree view with .gitignore applied
+# so node_modules / .venv / target / etc. don't drown the output.
+# Flags worth keeping: --smart-group hides the redundant Admin Admin column on
+# Windows; --color-scale=all gradient-colors size+age columns; --hyperlink lets
+# Windows Terminal Ctrl+click filenames to open them.
 if (Get-Command eza -ErrorAction SilentlyContinue) {
-    function ll { eza --icons --git --long --group-directories-first @args }
-    function la { eza --icons --git --long --all --group-directories-first @args }
-    function lt { eza --icons --tree --level=2 @args }
+    function ll { eza --icons --git --long --all --group-directories-first --smart-group --color-scale=all --hyperlink @args }
+    Set-Alias -Name la -Value ll
+    function lt { eza --icons --tree --level=2 --git-ignore @args }
 }
 # bat
 if (Get-Command bat -ErrorAction SilentlyContinue) {
