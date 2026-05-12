@@ -68,9 +68,11 @@ _UseCachedInit -Tool 'atuin'    -InitArgs @('init','powershell','--disable-up-ar
 # so node_modules / .venv / target / etc. don't drown the output.
 # Flags worth keeping: --smart-group hides the redundant Admin Admin column on
 # Windows; --color-scale=all gradient-colors size+age columns; --hyperlink lets
-# Windows Terminal Ctrl+click filenames to open them.
+# Windows Terminal Ctrl+click filenames to open them; --total-size shows
+# recursive directory sizes (slow on huge trees like node_modules — bypass
+# with `eza --long ...` if it ever bites).
 if (Get-Command eza -ErrorAction SilentlyContinue) {
-    function ll { eza --icons --git --long --all --group-directories-first --smart-group --color-scale=all --hyperlink @args }
+    function ll { eza --icons --git --long --all --group-directories-first --smart-group --total-size --color-scale=all --hyperlink @args }
     Set-Alias -Name la -Value ll
     function lt { eza --icons --tree --level=2 --git-ignore @args }
 }
