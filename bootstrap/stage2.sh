@@ -34,8 +34,8 @@ else
 fi
 
 if [ ! -d "$SSHCFG_DIR" ]; then
-    log "Cloning qqgjyx/ssh-config to $SSHCFG_DIR"
-    gh repo clone qqgjyx/ssh-config "$SSHCFG_DIR"
+    log "Cloning qqgjyx/_ssh-config to $SSHCFG_DIR"
+    gh repo clone qqgjyx/_ssh-config "$SSHCFG_DIR"
     echo "  (review $SSHCFG_DIR/README for ~/.ssh/config wiring)"
 else
     echo "✓ ssh-config already cloned at $SSHCFG_DIR"
