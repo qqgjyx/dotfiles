@@ -57,6 +57,39 @@ else
     echo "✓ ssh-config already cloned at $SSHCFG_DIR"
 fi
 
+# 1b. SSH multiplexing block in ~/.ssh/config (POSIX owns this as of
+# qqgjyx/_ssh-config#15 which removed ControlMaster from Host * in source).
+# Sentinel-bracketed for idempotency; user's later Host * blocks still apply
+# for non-overlapping options (ssh_config: first value found per option wins).
+SSH_DIR="$HOME/.ssh"
+SSH_CONFIG="$SSH_DIR/config"
+MP_START="# >>> qqgjyx/dotfiles managed: posix ssh multiplexing >>>"
+MP_END="# <<< qqgjyx/dotfiles managed: posix ssh multiplexing <<<"
+
+mkdir -p "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+mkdir -p "$SSH_DIR/sockets"
+chmod 700 "$SSH_DIR/sockets"
+
+if ! grep -qF "$MP_START" "$SSH_CONFIG" 2>/dev/null; then
+    existing=""
+    [ -f "$SSH_CONFIG" ] && existing=$(cat "$SSH_CONFIG")
+    cat > "$SSH_CONFIG" <<EOF
+$MP_START
+Host *
+    ControlMaster auto
+    ControlPath ~/.ssh/sockets/%r@%h-%p
+    ControlPersist 3600
+$MP_END
+
+$existing
+EOF
+    chmod 600 "$SSH_CONFIG"
+    echo "+ added POSIX multiplexing block to $SSH_CONFIG"
+else
+    echo "✓ POSIX multiplexing block already in $SSH_CONFIG"
+fi
+
 # 2. SSH key generation (interactive)
 SSH_KEY="$HOME/.ssh/id_ed25519"
 if [ ! -f "$SSH_KEY" ]; then

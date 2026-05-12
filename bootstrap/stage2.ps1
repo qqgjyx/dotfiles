@@ -82,6 +82,50 @@ if ($existing_junction) {
     Write-Host "✓ ssh-config already cloned at $sshcfg_dir"
 }
 
+# 1b. Multiplexing override in ~/.ssh/config. Windows OpenSSH can't speak the
+# Unix-socket ControlPath that some _ssh-config versions or other includes may
+# set; force it off here. Defense-in-depth: as of qqgjyx/_ssh-config#15 the
+# source no longer sets multiplexing, so this only matters if an older copy or
+# a downstream re-add slips in. Sentinel-bracketed for idempotency.
+$ssh_dir = Join-Path $HOME ".ssh"
+$ssh_config = Join-Path $ssh_dir "config"
+$mp_start = "# >>> qqgjyx/dotfiles managed: windows ssh multiplexing override >>>"
+$mp_end   = "# <<< qqgjyx/dotfiles managed: windows ssh multiplexing override <<<"
+$mp_block = @"
+$mp_start
+Host *
+    ControlMaster no
+    ControlPath none
+$mp_end
+
+
+"@
+New-Item -ItemType Directory -Force -Path $ssh_dir | Out-Null
+$existing_cfg = if (Test-Path $ssh_config) { Get-Content $ssh_config -Raw } else { "" }
+if ($existing_cfg -notmatch [regex]::Escape($mp_start)) {
+    Set-Content -Path $ssh_config -Value ($mp_block + $existing_cfg) -Encoding UTF8 -NoNewline
+    Write-Host "+ added multiplexing override to $ssh_config"
+} else {
+    Write-Host "✓ multiplexing override already in $ssh_config"
+}
+
+# 1c. ACL lockdown on the junction's config file when junction is in play.
+# OpenSSH refuses Include'd files where Authenticated Users has any access,
+# which is OneDrive's default inherited ACL. Target the file specifically so
+# editing access via OneDrive on the rest of the repo is preserved.
+# Caveat: OneDrive may re-apply inherited ACLs on round-trip sync — re-run
+# stage2 (idempotent) if "Bad permissions" returns.
+if ($existing_junction -or $env_target) {
+    $cfg_file = Join-Path $sshcfg_link "config"
+    if (Test-Path $cfg_file) {
+        Write-Host "==> icacls lockdown on $cfg_file"
+        icacls "$cfg_file" /inheritance:r /grant:r "${env:USERNAME}:F" /grant:r "SYSTEM:F" | Out-Null
+        Assert-Exit "icacls $cfg_file"
+    } else {
+        Write-Warning "junction in place but $cfg_file not found; skipping icacls (re-run stage2 once the included config exists)"
+    }
+}
+
 # 2. SSH key generation (interactive)
 $ssh_key = Join-Path $HOME ".ssh\id_ed25519"
 if (-not (Test-Path $ssh_key)) {
