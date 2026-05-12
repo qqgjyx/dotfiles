@@ -78,7 +78,7 @@ Three repos work together:
 |---|---|---|
 | `qqgjyx/dotfiles` *(this)* | public | chezmoi source state — non-sensitive configs |
 | `qqgjyx/skills` | private | Claude Code skills → cloned to `~/.claude/skills/` |
-| `qqgjyx/ssh-config` | private | `~/.ssh/config` + per-host fragments |
+| `qqgjyx/_ssh-config` | private | `~/.ssh/config` + per-host fragments |
 
 Why chezmoi: Go-templated source state with per-machine variables, OS-conditional ignores, and idempotent `apply`. The full design rationale is in the [v2 migration PR](https://github.com/qqgjyx/dotfiles/issues/1).
 
@@ -143,7 +143,7 @@ Why chezmoi: Go-templated source state with per-machine variables, OS-conditiona
 
 | Feature | Profile | Notes |
 |---|---|---|
-| SSH config | core | private repo `qqgjyx/ssh-config`, single file + `Include` directive |
+| SSH config | core | private repo `qqgjyx/_ssh-config`, single file + `Include` directive |
 | SSH key | core | per-machine ed25519, passphrase-protected, ssh-agent |
 | Mosh | dev | resilient SSH over UDP |
 | Tailscale | dev | mesh VPN; `tailscale up` post-bootstrap (manual auth) |

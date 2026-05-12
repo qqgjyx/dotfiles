@@ -54,9 +54,9 @@ if (-not (Test-Path $skills_dir)) {
 }
 
 if (-not (Test-Path $sshcfg_dir)) {
-    Write-Host "==> Cloning qqgjyx/ssh-config to $sshcfg_dir"
-    gh repo clone qqgjyx/ssh-config $sshcfg_dir
-    Assert-Exit "gh repo clone qqgjyx/ssh-config"
+    Write-Host "==> Cloning qqgjyx/_ssh-config to $sshcfg_dir"
+    gh repo clone qqgjyx/_ssh-config $sshcfg_dir
+    Assert-Exit "gh repo clone qqgjyx/_ssh-config"
     Write-Host "  (review $sshcfg_dir\README for ~/.ssh/config wiring)"
 } else {
     Write-Host "✓ ssh-config already cloned at $sshcfg_dir"
