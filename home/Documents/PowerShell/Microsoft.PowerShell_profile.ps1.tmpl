@@ -4,26 +4,26 @@
 # --- PSReadLine (autosuggest + syntax HL + history search) -------------------
 # PredictionSource = History (not HistoryAndPlugin): plugin source probes
 # PSFzf at startup, which costs ~180ms and we don't load PSFzf anymore.
-if (Get-Module -ListAvailable -Name PSReadLine) {
-    Import-Module PSReadLine
-    Set-PSReadLineOption -EditMode Emacs
-    Set-PSReadLineOption -PredictionSource History
-    Set-PSReadLineOption -PredictionViewStyle InlineView
-    Set-PSReadLineKeyHandler -Key Tab          -Function MenuComplete
-    Set-PSReadLineKeyHandler -Key UpArrow      -Function HistorySearchBackward
-    Set-PSReadLineKeyHandler -Key DownArrow    -Function HistorySearchForward
-}
+# PSReadLine ships with PowerShell 7 and auto-loads, so the availability probe
+# (Get-Module -ListAvailable, ~49ms) is dead weight; import it directly.
+Import-Module PSReadLine
+Set-PSReadLineOption -EditMode Emacs
+Set-PSReadLineOption -PredictionSource History
+Set-PSReadLineOption -PredictionViewStyle InlineView
+Set-PSReadLineKeyHandler -Key Tab          -Function MenuComplete
+Set-PSReadLineKeyHandler -Key UpArrow      -Function HistorySearchBackward
+Set-PSReadLineKeyHandler -Key DownArrow    -Function HistorySearchForward
 
 # --- posh-git (git integration in prompt + tab completion) -------------------
 # `Import-Module posh-git` is ~390ms cold — by far the heaviest item in this
 # profile. Defer until the user actually runs git: stub a `git` function that,
 # on first call, removes itself, imports posh-git, and re-invokes git for real.
-if (Get-Module -ListAvailable -Name posh-git) {
-    function global:git {
-        Remove-Item Function:git -Force
-        Import-Module posh-git
-        & git @args
-    }
+# Defined unconditionally (no ~26ms Get-Module -ListAvailable probe); the import
+# is best-effort so a missing posh-git still falls through to real git.
+function global:git {
+    Remove-Item Function:git -Force
+    Import-Module posh-git -ErrorAction SilentlyContinue
+    & git @args
 }
 
 # --- Tool init (cached) -----------------------------------------------------
@@ -39,6 +39,18 @@ function _UseCachedInit {
              ((Get-Item $bin.Source).LastWriteTimeUtc -gt (Get-Item $cache).LastWriteTimeUtc)
     if ($stale) {
         & $Tool @InitArgs | Set-Content -Path $cache -Encoding UTF8NoBOM
+        # starship's full init spawns `starship prompt --continuation` on *every*
+        # shell start (~67ms) just to set the PSReadLine continuation prompt.
+        # Capture it once here (only on rebuild) and inline a static value. If a
+        # future starship changes the init format the regex won't match and the
+        # original (slower) block is left intact; no breakage, just no speedup.
+        if ($Tool -eq 'starship') {
+            $cont = & $Tool prompt --continuation
+            $repl = "Set-PSReadLineOption -ContinuationPrompt '" + ($cont -replace "'", "''") + "'"
+            $patt = '(?s)Set-PSReadLineOption -ContinuationPrompt \(\s*Invoke-Native.*?--continuation"\s*\)\s*\)'
+            $text = [regex]::Replace((Get-Content $cache -Raw), $patt, { param($m) $repl })
+            Set-Content -Path $cache -Value $text -Encoding UTF8NoBOM
+        }
     }
     . $cache
 }
@@ -71,15 +83,14 @@ _UseCachedInit -Tool 'atuin'    -InitArgs @('init','powershell','--disable-up-ar
 # Windows Terminal Ctrl+click filenames to open them; --total-size shows
 # recursive directory sizes (slow on huge trees like node_modules — bypass
 # with `eza --long ...` if it ever bites).
-if (Get-Command eza -ErrorAction SilentlyContinue) {
-    function ll { eza --icons --git --long --all --group-directories-first --smart-group --total-size --color-scale=all --hyperlink @args }
-    Set-Alias -Name la -Value ll
-    function lt { eza --icons --tree --level=2 --git-ignore @args }
-}
+# Defined unconditionally (no ~17ms Get-Command probe each); eza and bat are
+# always present on this box. If either is uninstalled its command errors at call
+# time (and `cat` would resolve to nothing; reinstall bat or drop the alias).
+function ll { eza --icons --git --long --all --group-directories-first --smart-group --total-size --color-scale=all --hyperlink @args }
+Set-Alias -Name la -Value ll
+function lt { eza --icons --tree --level=2 --git-ignore @args }
 # bat
-if (Get-Command bat -ErrorAction SilentlyContinue) {
-    Set-Alias -Name cat -Value bat -Option AllScope
-}
+Set-Alias -Name cat -Value bat -Option AllScope
 # chezmoi
 function cma { chezmoi apply @args }
 function cmd { chezmoi diff @args }
