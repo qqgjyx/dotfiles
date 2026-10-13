@@ -1,27 +1,19 @@
-{{- /*
-    .chezmoi.toml.tmpl — runs once on `chezmoi init` to generate
-    ~/.config/chezmoi/chezmoi.toml for this machine. Prompts for name,
-    email, install profile.
-*/ -}}
+{{- /* Runs on `chezmoi init`. Answers are saved to ~/.config/chezmoi/chezmoi.toml;
+       re-ask with `chezmoi init --prompt`. */ -}}
+{{- $name     := promptStringOnce      . "name"     "Git name" -}}
+{{- $email    := promptStringOnce      . "email"    "Git email" -}}
+{{- $choices  := list "starship" "zoxide" "eza" "gh" "jetbrains-mono-nf" "latex" -}}
+{{- $packages := promptMultichoiceOnce . "packages" "Packages" $choices $choices -}}
 
-{{- $name    := promptStringOnce . "name"    "Name"  "Juntang" -}}
-{{- $email   := promptStringOnce . "email"   "Email" "150919274+qqgjyx@users.noreply.github.com" -}}
-{{- $profile := promptStringOnce . "profile" "Install profile (core|dev|full)" "core" -}}
-
-# Persist the source directory so plain `chezmoi diff/verify/apply` work
-# after bootstrap. stage2 passes --source as a one-shot CLI flag; without
-# this, chezmoi falls back to ~/.local/share/chezmoi which doesn't exist.
-sourceDir = {{ joinPath .chezmoi.homeDir "dotfiles" | quote }}
+# Use this clone in place (`chezmoi init --source .`), so later commands find it.
+sourceDir = {{ .chezmoi.workingTree | quote }}
 
 [data]
-    name    = {{ $name    | quote }}
-    email   = {{ $email   | quote }}
-    profile = {{ $profile | quote }}
+    name     = {{ $name  | quote }}
+    email    = {{ $email | quote }}
+    packages = {{ $packages | toToml }}
 {{ if eq .chezmoi.os "windows" }}
-# chezmoi spawns powershell.exe as a child for .ps1 run_onchange scripts;
-# the child inherits Machine-scope execution policy, which is Restricted on
-# many locked-down boxes. Bypass scoped to chezmoi-invoked scripts only.
 [interpreters.ps1]
-    command = "powershell"
-    args    = ["-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass"]
+    command = "pwsh"
+    args    = ["-NoLogo", "-NoProfile"]
 {{- end }}
