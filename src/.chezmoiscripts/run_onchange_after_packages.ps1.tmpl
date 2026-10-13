@@ -1,0 +1,13 @@
+{{- if and (eq .chezmoi.os "windows") .packages -}}
+# Install ticked packages via scoop. Re-runs when the selection changes; scoop skips
+# anything already installed.
+{{ template "step.ps1" }}
+function bucket { if ((scoop bucket list).Name -notcontains $args[0]) { step scoop bucket add $args[0] } }
+{{  range .catalog }}{{ if has .name $.packages }}
+{{-   if contains "/" .scoop }}
+bucket {{ index (splitList "/" .scoop) 0 }}
+{{-   end }}
+step scoop install {{ .scoop }}
+{{- end }}{{ end }}
+finish
+{{- end }}

@@ -7,7 +7,10 @@ $p = "$HOME\.config\powershell\profile.ps1"; if (Test-Path $p) { . $p }
 '@
 $current = Get-Content $PROFILE -Raw -ErrorAction SilentlyContinue
 if ($current -ne $stub) {
-    if ($current) { Write-Host "pwsh-profile: replacing existing $PROFILE" }
+    if ($current) {
+        Copy-Item $PROFILE "$PROFILE.bak" -Force
+        Write-Host "==> pwsh-profile: replaced $PROFILE (old one saved as .bak)"
+    }
     New-Item -ItemType Directory -Force (Split-Path $PROFILE) | Out-Null
     Set-Content -Path $PROFILE -Value $stub -NoNewline
 }

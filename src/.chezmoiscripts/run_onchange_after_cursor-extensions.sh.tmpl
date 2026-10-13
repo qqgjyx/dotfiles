@@ -1,13 +1,15 @@
 {{- if ne .chezmoi.os "windows" -}}
 #!/bin/sh
 # Install Cursor extensions listed in .chezmoidata/cursor.toml. Re-runs when the
-# list changes, and once more after Cursor gets installed (the lookPath result
+# list changes, and once more after `cursor` appears on PATH (the lookPath result
 # changes this script's content).
 {{ if lookPath "cursor" -}}
-for e in {{ join " " .cursor.extensions }}; do
-    cursor --install-extension "$e"
-done
+{{ template "step.sh" }}
+{{-   range .cursor.extensions }}
+step cursor --install-extension {{ . }}
+{{-   end }}
+finish
 {{- else -}}
-echo 'cursor-extensions: Cursor not installed yet; run `chezmoi apply` again after installing it'
+echo 'cursor-extensions: `cursor` not on PATH; install Cursor (macOS: Command Palette > "Shell Command: Install cursor command"), then run `chezmoi apply` again'
 {{- end }}
 {{- end }}
