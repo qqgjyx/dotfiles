@@ -9,7 +9,9 @@
   "files.insertFinalNewline": true,
   "files.eol": "\n",
   "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font, 'Microsoft YaHei', 'PingFang SC', sans-serif",
-  "workbench.colorTheme": "Catppuccin Mocha",
-  "workbench.iconTheme": "catppuccin-mocha",
+  "window.autoDetectColorScheme": true,
+  "workbench.preferredLightColorTheme": "Catppuccin Latte",
+  "workbench.preferredDarkColorTheme": "Catppuccin Mocha",
+  "workbench.iconTheme": "catppuccin-latte",
   "telemetry.telemetryLevel": "off"
 }
