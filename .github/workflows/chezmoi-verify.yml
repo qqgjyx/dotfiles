@@ -7,40 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  parse:
-    name: per-template parse check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install chezmoi
-        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
-
-      - name: Generate config from the init template (simulated answers, all packages)
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          all=$(sed -n 's/.*name = "\([^"]*\)".*/\1/p' src/.chezmoidata/packages.toml | paste -sd/ -)
-          mkdir -p "$HOME/.config/chezmoi"
-          chezmoi execute-template --source="$GITHUB_WORKSPACE" --init --no-tty \
-              --promptString "Git name=CI,Git email=ci@example.com" \
-              --promptMultichoice "Packages=$all" \
-              < src/.chezmoi.toml.tmpl > "$HOME/.config/chezmoi/chezmoi.toml"
-          cat "$HOME/.config/chezmoi/chezmoi.toml"
-
-      - name: chezmoi execute-template per .tmpl
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          fail=0
-          while IFS= read -r tmpl; do
-              # The init template was rendered in the previous step.
-              case "$tmpl" in *.chezmoi.toml.tmpl) continue ;; esac
-              if ! chezmoi execute-template --source="$GITHUB_WORKSPACE" < "$tmpl" > /dev/null; then
-                  echo "::error file=$tmpl::template parse failed"
-                  fail=1
-              fi
-          done < <(find src -name '*.tmpl' -type f)
-          exit "$fail"
-
   apply:
     name: chezmoi apply --dry-run (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -55,20 +21,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install chezmoi
-        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
-
-      - name: Generate config from the init template (simulated answers, all packages)
         run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          all=$(sed -n 's/.*name = "\([^"]*\)".*/\1/p' src/.chezmoidata/packages.toml | paste -sd/ -)
-          mkdir -p "$HOME/.config/chezmoi"
-          chezmoi execute-template --source="$GITHUB_WORKSPACE" --init --no-tty \
-              --promptString "Git name=CI,Git email=ci@example.com" \
-              --promptMultichoice "Packages=$all" \
-              < src/.chezmoi.toml.tmpl > "$HOME/.config/chezmoi/chezmoi.toml"
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      # Real init: renders .chezmoi.toml.tmpl; --promptDefaults ticks every package.
+      - name: chezmoi init
+        run: |
+          chezmoi init --source="$GITHUB_WORKSPACE" --no-tty --promptDefaults \
+              --promptString "Git name=CI,Git email=ci@example.com"
           cat "$HOME/.config/chezmoi/chezmoi.toml"
 
       - name: chezmoi apply --dry-run
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          chezmoi apply --source="$GITHUB_WORKSPACE" --dry-run --no-tty --verbose
+        run: chezmoi apply --dry-run --no-tty --verbose

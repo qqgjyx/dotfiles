@@ -3,10 +3,7 @@
 # vim:ft=ps1
 
 # --- PSReadLine (autosuggest + syntax HL + history search) -------------------
-# PredictionSource = History (not HistoryAndPlugin): plugin source probes
-# PSFzf at startup, which costs ~180ms and we don't load PSFzf anymore.
-# PSReadLine ships with PowerShell 7 and auto-loads, so the availability probe
-# (Get-Module -ListAvailable, ~49ms) is dead weight; import it directly.
+# Ships with PowerShell 7; History-only prediction skips slower plugin probes.
 Import-Module PSReadLine
 Set-PSReadLineOption -EditMode Emacs
 Set-PSReadLineOption -PredictionSource History
@@ -72,14 +69,8 @@ function lt { eza --icons --tree --level=2 --git-ignore @args }
 function cza { chezmoi apply @args }
 function czd { chezmoi diff @args }
 function cze { chezmoi edit @args }
-# git short
-# PowerShell ships built-in aliases (e.g. gp -> Get-ItemProperty) that resolve
-# before user-defined functions. Drop the conflicts before defining ours.
-foreach ($_n in @('gp')) {
-    if (Get-Alias $_n -ErrorAction SilentlyContinue) {
-        Remove-Item -Path "Alias:$_n" -Force -ErrorAction SilentlyContinue
-    }
-}
+# git short (built-in alias gp -> Get-ItemProperty would shadow our function)
+Remove-Item Alias:gp -Force -ErrorAction SilentlyContinue
 function gs { git status --short --branch }
 function gp { git pull --ff-only }
 
