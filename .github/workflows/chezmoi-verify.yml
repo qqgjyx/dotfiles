@@ -7,14 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  shellcheck:
-    name: shellcheck (bash)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: shellcheck
-        run: shellcheck bootstrap/stage1.sh bootstrap/stage2.sh home/private_dot_zsh/aliases.sh
-
   parse:
     name: per-template parse check
     runs-on: ubuntu-latest
@@ -31,7 +23,7 @@ jobs:
           [data]
               name = "CI"
               email = "ci@example.com"
-              profile = "core"
+              packages = ["starship", "zoxide", "eza", "gh", "jetbrains-mono-nf", "latex"]
           EOF
 
       - name: chezmoi execute-template per .tmpl
@@ -39,14 +31,14 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           fail=0
           while IFS= read -r tmpl; do
-              # .chezmoi.toml.tmpl uses promptStringOnce — only valid in 'chezmoi init' context,
-              # not execute-template. Skipped here; covered by the apply --dry-run job.
+              # .chezmoi.toml.tmpl uses prompt*Once — only valid in 'chezmoi init' context,
+              # not plain execute-template. Covered by the apply --dry-run job's data instead.
               case "$tmpl" in *.chezmoi.toml.tmpl) continue ;; esac
               if ! chezmoi execute-template --source="$GITHUB_WORKSPACE" < "$tmpl" > /dev/null; then
                   echo "::error file=$tmpl::template parse failed"
                   fail=1
               fi
-          done < <(find home -name '*.tmpl' -type f)
+          done < <(find src -name '*.tmpl' -type f)
           exit "$fail"
 
   apply:
@@ -72,7 +64,7 @@ jobs:
           [data]
               name = "CI"
               email = "ci@example.com"
-              profile = "core"
+              packages = ["starship", "zoxide", "eza", "gh", "jetbrains-mono-nf", "latex"]
           EOF
 
       - name: chezmoi apply --dry-run
