@@ -1,4 +1,7 @@
 {{- /* ~/.gitconfig — templated from .chezmoi.toml prompts */ -}}
+{{- /* Windows: use the system OpenSSH (it talks to the ssh-agent service) when present. */ -}}
+{{- $openssh := "C:/Windows/System32/OpenSSH" -}}
+{{- $winssh := and (eq .chezmoi.os "windows") (stat (print $openssh "/ssh.exe")) -}}
 [user]
 	name = {{ .name | quote }}
 	email = {{ .email | quote }}
@@ -9,10 +12,10 @@
 
 [gpg]
 	format = ssh
-{{- if eq .chezmoi.os "windows" }}
+{{- if $winssh }}
 
 [gpg "ssh"]
-	program = "C:/Windows/System32/OpenSSH/ssh-keygen.exe"
+	program = {{ print $openssh "/ssh-keygen.exe" | quote }}
 {{- end }}
 
 [commit]
@@ -51,8 +54,8 @@
 	autocrlf = input
 	eol = lf
 	excludesfile = {{ joinPath .chezmoi.homeDir ".gitignore_global" | quote }}
-{{- if eq .chezmoi.os "windows" }}
-	sshCommand = "C:/Windows/System32/OpenSSH/ssh.exe"
+{{- if $winssh }}
+	sshCommand = {{ print $openssh "/ssh.exe" | quote }}
 {{- end }}
 
 [alias]

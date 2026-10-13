@@ -14,7 +14,9 @@ sourceDir = {{ .chezmoi.workingTree | quote }}
     email    = {{ $email | quote }}
     packages = {{ $packages | toToml }}
 {{ if eq .chezmoi.os "windows" }}
+# Bypass is scoped to chezmoi's own scripts, so they run even under a stricter
+# machine/GPO execution policy.
 [interpreters.ps1]
     command = "pwsh"
-    args    = ["-NoLogo", "-NoProfile"]
+    args    = ["-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass"]
 {{- end }}
