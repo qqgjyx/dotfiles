@@ -1,10 +1,11 @@
 # Package tick list. `chezmoi init` offers every entry (all ticked); picks are saved
 # as `packages` in ~/.config/chezmoi/chezmoi.toml. scoop "bucket/name" adds the bucket.
+# desc is shown next to the name in the tick list (no "/" in it: it separates picks).
 catalog = [
-  { name = "starship",          scoop = "starship",                    brew = "starship" },
-  { name = "zoxide",            scoop = "zoxide",                      brew = "zoxide" },
-  { name = "eza",               scoop = "eza",                         brew = "eza" },
-  { name = "gh",                scoop = "gh",                          brew = "gh" },
-  { name = "jetbrains-mono-nf", scoop = "nerd-fonts/JetBrainsMono-NF", brew = "font-jetbrains-mono-nerd-font", cask = true },
-  { name = "latex",             scoop = "miktex",                      brew = "mactex",                        cask = true },
+  { name = "starship",          desc = "shell prompt: git status, python env",  scoop = "starship",                    brew = "starship" },
+  { name = "zoxide",            desc = "smarter cd: `z proj` jumps there",      scoop = "zoxide",                      brew = "zoxide" },
+  { name = "eza",               desc = "modern ls, powers ll, la, lt",          scoop = "eza",                         brew = "eza" },
+  { name = "gh",                desc = "GitHub CLI: auth, repos, PRs",          scoop = "gh",                          brew = "gh" },
+  { name = "jetbrains-mono-nf", desc = "terminal and editor font with icons",   scoop = "nerd-fonts/JetBrainsMono-NF", brew = "font-jetbrains-mono-nerd-font", cask = true },
+  { name = "latex",             desc = "LaTeX: MiKTeX on Windows, MacTeX on Mac", scoop = "miktex",                    brew = "mactex",                        cask = true },
 ]
