@@ -9,6 +9,11 @@
 
 [gpg]
 	format = ssh
+{{- if eq .chezmoi.os "windows" }}
+
+[gpg "ssh"]
+	program = "C:/Windows/System32/OpenSSH/ssh-keygen.exe"
+{{- end }}
 
 [commit]
 	gpgsign = true
@@ -46,20 +51,9 @@
 	autocrlf = input
 	eol = lf
 	excludesfile = {{ joinPath .chezmoi.homeDir ".gitignore_global" | quote }}
-{{- if lookPath "delta" }}
-	pager = delta
+{{- if eq .chezmoi.os "windows" }}
+	sshCommand = "C:/Windows/System32/OpenSSH/ssh.exe"
 {{- end }}
-
-[interactive]
-{{- if lookPath "delta" }}
-	diffFilter = delta --color-only
-{{- end }}
-
-[delta]
-	side-by-side = true
-	line-numbers = true
-	syntax-theme = Catppuccin-mocha
-	navigate = true
 
 [alias]
 	lg = log --graph --pretty=format:'%C(yellow)%h%C(reset) %C(green)%an%C(reset) %C(cyan)%ar%C(reset)%C(auto)%d%C(reset) %s' --abbrev-commit
