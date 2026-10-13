@@ -1,0 +1,16 @@
+{{- if ne .chezmoi.os "windows" -}}
+#!/bin/sh
+# Install ticked packages via brew. Re-runs when the selection changes; brew skips
+# anything already installed. Casks are macOS-only, so Linux skips them.
+set -eu
+brew install antidote   # zsh plugin manager, needed by .zshrc
+{{- range .catalog }}{{ if has .name $.packages }}
+{{-   if not (hasKey . "cask") }}
+brew install {{ .brew }}
+{{-   else if eq $.chezmoi.os "darwin" }}
+brew install --cask {{ .brew }}
+{{-   else }}
+echo "skip {{ .name }}: no brew casks on Linux"
+{{-   end }}
+{{- end }}{{ end }}
+{{- end }}

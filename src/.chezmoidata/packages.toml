@@ -1,0 +1,10 @@
+# Package tick list. `chezmoi init` offers every entry (all ticked); picks are saved
+# as `packages` in ~/.config/chezmoi/chezmoi.toml. scoop "bucket/name" adds the bucket.
+catalog = [
+  { name = "starship",          scoop = "starship",                    brew = "starship" },
+  { name = "zoxide",            scoop = "zoxide",                      brew = "zoxide" },
+  { name = "eza",               scoop = "eza",                         brew = "eza" },
+  { name = "gh",                scoop = "gh",                          brew = "gh" },
+  { name = "jetbrains-mono-nf", scoop = "nerd-fonts/JetBrainsMono-NF", brew = "font-jetbrains-mono-nerd-font", cask = true },
+  { name = "latex",             scoop = "miktex",                      brew = "mactex",                        cask = true },
+]

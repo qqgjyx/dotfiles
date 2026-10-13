@@ -2,7 +2,8 @@
        re-ask with `chezmoi init --prompt`. */ -}}
 {{- $name     := promptStringOnce      . "name"     "Git name" -}}
 {{- $email    := promptStringOnce      . "email"    "Git email" -}}
-{{- $choices  := list "starship" "zoxide" "eza" "gh" "jetbrains-mono-nf" "latex" -}}
+{{- $choices  := list -}}
+{{- range (include ".chezmoidata/packages.toml" | fromToml).catalog }}{{ $choices = append $choices .name }}{{ end -}}
 {{- $packages := promptMultichoiceOnce . "packages" "Packages" $choices $choices -}}
 
 # Use this clone in place (`chezmoi init --source .`), so later commands find it.

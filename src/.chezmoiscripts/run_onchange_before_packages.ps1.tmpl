@@ -1,0 +1,12 @@
+{{- if eq .chezmoi.os "windows" -}}
+{{- $want := list -}}
+{{- range .catalog }}{{ if has .name $.packages }}{{ $want = append $want .scoop }}{{ end }}{{ end -}}
+{{- if $want -}}
+# Install ticked packages via scoop. Re-runs when the selection changes; scoop skips
+# anything already installed.
+foreach ($p in '{{ join " " $want }}' -split ' ') {
+    if ($p -like '*/*') { scoop bucket add ($p -split '/')[0] }
+    scoop install $p
+}
+{{- end }}
+{{- end }}
