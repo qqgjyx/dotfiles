@@ -18,8 +18,9 @@ My config for Windows · macOS · Linux, managed by [chezmoi](https://www.chezmo
 **2. Dotfiles.** Clone outside OneDrive/iCloud; synced cloud files break chezmoi.
 
 ```powershell
-# Windows
-git clone https://github.com/qqgjyx/dotfiles ~\dev\dotfiles; cd ~\dev\dotfiles
+# Windows, in PowerShell 7 (pwsh)
+git clone https://github.com/qqgjyx/dotfiles $HOME\dev\dotfiles; cd $HOME\dev\dotfiles
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser   # scoop needs it; no-op on Win 11
 irm get.scoop.sh | iex; scoop install chezmoi
 chezmoi init --source .; chezmoi diff; chezmoi apply
 ```
