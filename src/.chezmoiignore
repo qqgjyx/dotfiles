@@ -1,16 +1,16 @@
-{{- /* OS-conditional skip rules. Patterns match TARGET paths — for run_onchange
-       scripts, the target name is the script filename WITHOUT the run_onchange_
-       prefix. */ -}}
+{{- /* Per-OS skip rules (target paths). Scripts in .chezmoiscripts/ need none:
+       they render empty, and so are skipped, on the wrong OS. */ -}}
 {{- if eq .chezmoi.os "windows" }}
 .zshrc
-.bashrc
 .zsh_plugins.txt
-.config/atuin/**
-.zsh/**
-install-cursor.sh
-install-packages.sh
+.config/Cursor
+Library
 {{- else }}
-.config/powershell/**
-install-cursor.ps1
-install-packages.ps1
+.config/powershell
+AppData
+{{-   if eq .chezmoi.os "darwin" }}
+.config/Cursor
+{{-   else }}
+Library
+{{-   end }}
 {{- end }}

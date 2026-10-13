@@ -1,0 +1,12 @@
+{{- if eq .chezmoi.os "windows" -}}
+# Install Cursor extensions listed in .chezmoidata/cursor.toml. Re-runs when the
+# list changes, and once more after Cursor gets installed (the lookPath result
+# changes this script's content).
+{{ if lookPath "cursor" -}}
+foreach ($e in '{{ join " " .cursor.extensions }}' -split ' ') {
+    cursor --install-extension $e
+}
+{{- else -}}
+Write-Host 'cursor-extensions: Cursor not installed yet; run `chezmoi apply` again after installing it'
+{{- end }}
+{{- end }}

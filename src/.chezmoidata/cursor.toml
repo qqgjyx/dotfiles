@@ -1,13 +1,6 @@
-# Static data shared across all machines. Per-machine vars live in
-# ~/.config/chezmoi/chezmoi.toml (generated from .chezmoi.toml.tmpl on init).
-
-[theme]
-    name = "Catppuccin Mocha"
-    bat  = "Catppuccin-mocha"
-
-# Cursor extensions, by profile. Templates reference .cursor.extensions.<profile>.
-[cursor.extensions]
-    base = [
+# Cursor extensions, installed by .chezmoiscripts/run_onchange_after_cursor-extensions.*
+[cursor]
+    extensions = [
         "catppuccin.catppuccin-vsc",
         "catppuccin.catppuccin-vsc-icons",
         "ms-python.python",
@@ -22,5 +15,5 @@
         "gruntfuggly.todo-tree",
         "streetsidesoftware.code-spell-checker",
         "MS-CEINTL.vscode-language-pack-zh-hans",
+        "james-yu.latex-workshop",
     ]
-    full = ["james-yu.latex-workshop"]
