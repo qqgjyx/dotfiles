@@ -4,10 +4,14 @@
 {{ template "step.ps1" }}
 function bucket { if ((scoop bucket list).Name -notcontains $args[0]) { step scoop bucket add $args[0] } }
 {{  range .catalog }}{{ if has .name $.packages }}
-{{-   if contains "/" .scoop }}
-bucket {{ index (splitList "/" .scoop) 0 }}
-{{-   end }}
-step scoop install {{ .scoop }}
+{{-   if not (hasKey . "scoop") }}
+Write-Host "skip {{ .name }}: not available on Windows yet"
+{{-   else }}{{ range splitList " " .scoop }}
+{{-     if contains "/" . }}
+bucket {{ index (splitList "/" .) 0 }}
+{{-     end }}
+step scoop install {{ . }}
+{{-   end }}{{ end }}
 {{- end }}{{ end }}
 finish
 {{- end }}

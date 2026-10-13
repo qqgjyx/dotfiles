@@ -5,7 +5,9 @@
 {{ template "step.sh" }}
 step brew install antidote   # zsh plugin manager, needed by .zshrc
 {{- range .catalog }}{{ if has .name $.packages }}
-{{-   if not (dig "cask" false .) }}
+{{-   if not (hasKey . "brew") }}
+echo "skip {{ .name }}: not available on this OS yet"
+{{-   else if not (dig "cask" false .) }}
 step brew install {{ .brew }}
 {{-   else if eq $.chezmoi.os "darwin" }}
 step brew install --cask {{ .brew }}

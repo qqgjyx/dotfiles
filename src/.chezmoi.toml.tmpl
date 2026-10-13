@@ -12,7 +12,7 @@
 {{-   else }}{{ writeToStdout (printf "  ✗ %s\n" .) }}{{ $missing = append $missing . }}{{ end }}
 {{- end }}
 {{- writeToStdout "Tier 1 (official installers, see README; fine to add later)\n" -}}
-{{- range list "cursor" "claude" "codex" "uv" "tlmgr" }}
+{{- range list "cursor" "claude" "codex" "uv" }}
 {{-   writeToStdout (printf "  %s %s\n" (ternary "✓" "✗" (ne (lookPath .) "")) .) }}
 {{- end }}
 {{- /* CI runners lack scoop/brew on PATH; only real machines stop here. */ -}}
