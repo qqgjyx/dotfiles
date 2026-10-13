@@ -13,5 +13,12 @@ bucket {{ index (splitList "/" .) 0 }}
 step scoop install {{ . }}
 {{-   end }}{{ end }}
 {{- end }}{{ end }}
+{{- range .catalog }}{{ if and (has .name $.packages) (hasKey . "scoop_post") }}
+# pick up PATH entries the installs above just added
+$env:Path = [Environment]::GetEnvironmentVariable('Path', 'User') + ';' + [Environment]::GetEnvironmentVariable('Path', 'Machine')
+{{-   range .scoop_post }}
+step {{ . }}
+{{-   end }}
+{{- end }}{{ end }}
 finish
 {{- end }}
