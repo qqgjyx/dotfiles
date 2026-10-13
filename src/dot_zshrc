@@ -1,0 +1,52 @@
+# ~/.zshrc — zsh entry point for macOS/Linux
+# vim:ft=zsh
+
+# --- History -----------------------------------------------------------------
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=1000000
+SAVEHIST=1000000
+setopt extended_history hist_expire_dups_first hist_ignore_dups
+setopt hist_ignore_space hist_verify inc_append_history share_history
+
+# --- Homebrew (macOS: /opt/homebrew or /usr/local, Linux: linuxbrew) ---------
+for _brew in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+    [[ -x $_brew ]] && { eval "$($_brew shellenv)"; break; }
+done
+unset _brew
+
+# --- PATH --------------------------------------------------------------------
+typeset -U path
+path=("$HOME/.local/bin" "$HOME/bin" $path)
+export PATH
+
+# --- Plugins (antidote, installed by brew) -----------------------------------
+if [[ -n $HOMEBREW_PREFIX && -e $HOMEBREW_PREFIX/opt/antidote/share/antidote/antidote.zsh ]]; then
+    source "$HOMEBREW_PREFIX/opt/antidote/share/antidote/antidote.zsh"
+    antidote load "$HOME/.zsh_plugins.txt"
+fi
+
+# --- Tool init ---------------------------------------------------------------
+command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+command -v zoxide   >/dev/null 2>&1 && eval "$(zoxide init zsh --cmd z)"
+
+# --- Aliases -----------------------------------------------------------------
+if command -v eza >/dev/null 2>&1; then
+    alias ll='eza --icons --git --long --all --group-directories-first'
+    alias la='ll'
+    alias lt='eza --icons --tree --level=2 --git-ignore'
+else
+    alias ll='ls -lhA'
+    alias la='ll'
+fi
+alias g='git'
+alias gs='git status --short --branch'
+alias gp='git pull --ff-only'
+alias cza='chezmoi apply'
+alias czd='chezmoi diff'
+alias cze='chezmoi edit'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias mkdir='mkdir -p'
+
+# --- Local overrides ---------------------------------------------------------
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

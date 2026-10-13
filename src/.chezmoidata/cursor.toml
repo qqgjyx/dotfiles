@@ -1,0 +1,15 @@
+# Cursor extensions, installed by .chezmoiscripts/run_onchange_after_cursor-extensions.*
+[cursor]
+    extensions = [
+        "catppuccin.catppuccin-vsc",
+        "catppuccin.catppuccin-vsc-icons",
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "ms-toolsai.jupyter",
+        "alefragnani.project-manager",
+        "yzhang.markdown-all-in-one",
+        "MS-CEINTL.vscode-language-pack-zh-hans",
+        "james-yu.latex-workshop",
+        "tomoki1207.pdf",
+        "wayou.vscode-todo-highlight",
+    ]

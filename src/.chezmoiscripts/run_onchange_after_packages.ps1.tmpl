@@ -1,0 +1,24 @@
+{{- if and (eq .chezmoi.os "windows") .packages -}}
+# Install ticked packages via scoop. Re-runs when the selection changes; scoop skips
+# anything already installed.
+{{ template "step.ps1" }}
+function bucket { if ((scoop bucket list).Name -notcontains $args[0]) { step scoop bucket add $args[0] } }
+{{  range .catalog }}{{ if has .name $.packages }}
+{{-   if not (hasKey . "scoop") }}
+Write-Host "skip {{ .name }}: not available on Windows yet"
+{{-   else }}{{ range splitList " " .scoop }}
+{{-     if contains "/" . }}
+bucket {{ index (splitList "/" .) 0 }}
+{{-     end }}
+step scoop install {{ . }}
+{{-   end }}{{ end }}
+{{- end }}{{ end }}
+{{- range .catalog }}{{ if and (has .name $.packages) (hasKey . "scoop_post") }}
+# pick up PATH entries the installs above just added
+$env:Path = [Environment]::GetEnvironmentVariable('Path', 'User') + ';' + [Environment]::GetEnvironmentVariable('Path', 'Machine')
+{{-   range .scoop_post }}
+step {{ . }}
+{{-   end }}
+{{- end }}{{ end }}
+finish
+{{- end }}

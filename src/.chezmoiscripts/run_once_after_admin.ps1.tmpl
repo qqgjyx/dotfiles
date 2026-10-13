@@ -1,0 +1,21 @@
+{{- if eq .chezmoi.os "windows" -}}
+# One-time machine settings that need admin: start ssh-agent at boot, enable
+# Windows sudo (inline). Checks first, so re-runs never prompt for UAC; exits 1
+# if anything is still off, so chezmoi retries on the next apply.
+function done {
+    $agent = Get-Service ssh-agent -ErrorAction SilentlyContinue
+    $sudo  = (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Sudo -ErrorAction SilentlyContinue).Enabled
+    $agent.StartType -eq 'Automatic' -and $agent.Status -eq 'Running' -and $sudo -eq 3
+}
+if (done) { return }
+if (-not (Get-Service ssh-agent -ErrorAction SilentlyContinue) -or -not (Get-Command sudo -ErrorAction SilentlyContinue)) {
+    Write-Host 'admin: needs the OpenSSH Client feature and Windows sudo (Windows 11 24H2+)'; exit 1
+}
+
+Write-Host '==> enabling ssh-agent + sudo (one UAC prompt)'
+try {
+    Start-Process pwsh -Verb RunAs -Wait -ArgumentList '-NoProfile', '-Command',
+        'Set-Service ssh-agent -StartupType Automatic; Start-Service ssh-agent; sudo config --enable normal'
+} catch { Write-Host "admin: $($_.Exception.Message)"; exit 1 }
+if (-not (done)) { Write-Host 'admin: ssh-agent/sudo still not enabled'; exit 1 }
+{{- end }}

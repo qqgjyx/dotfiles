@@ -1,0 +1,14 @@
+{{- if eq .chezmoi.os "windows" -}}
+# Install Cursor extensions listed in .chezmoidata/cursor.toml. Re-runs when the
+# list changes, and once more after Cursor gets installed (the lookPath result
+# changes this script's content).
+{{ if lookPath "cursor" -}}
+{{ template "step.ps1" }}
+{{-   range .cursor.extensions }}
+step cursor --install-extension {{ . }}
+{{-   end }}
+finish
+{{- else -}}
+Write-Host 'cursor-extensions: `cursor` not found; install Cursor, then run `chezmoi apply` again'
+{{- end }}
+{{- end }}

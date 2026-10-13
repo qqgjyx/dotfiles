@@ -1,0 +1,16 @@
+{{- /* Per-OS skip rules (target paths). Scripts in .chezmoiscripts/ need none:
+       they render empty, and so are skipped, on the wrong OS. */ -}}
+{{ if ne .chezmoi.os "windows" }}
+.config/powershell
+AppData
+{{ end }}
+{{ if ne .chezmoi.os "darwin" }}
+Library
+{{ end }}
+{{ if ne .chezmoi.os "linux" }}
+.config/Cursor
+{{ end }}
+{{ if eq .chezmoi.os "windows" }}
+.zshrc
+.zsh_plugins.txt
+{{ end }}

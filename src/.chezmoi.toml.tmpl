@@ -1,0 +1,58 @@
+{{- /* Runs on `chezmoi init`. Answers are saved to ~/.config/chezmoi/chezmoi.toml;
+       re-ask with `chezmoi init --prompt`. */ -}}
+{{- $win := eq .chezmoi.os "windows" -}}
+
+{{- /* 1. Check prerequisites (required; stop if missing) and Tier 1 (recommended). */ -}}
+{{- $prereqs := list "git" (ternary "scoop" "brew" $win) -}}
+{{- if $win }}{{ $prereqs = append $prereqs "pwsh" }}{{ end -}}
+{{- $missing := list -}}
+{{- writeToStdout "\nPrerequisites (required)\n" -}}
+{{- range $prereqs }}
+{{-   if lookPath . }}{{ writeToStdout (printf "  ✓ %s\n" .) }}
+{{-   else }}{{ writeToStdout (printf "  ✗ %s\n" .) }}{{ $missing = append $missing . }}{{ end }}
+{{- end }}
+{{- writeToStdout "Tier 1 (official installers, see README; fine to add later)\n" -}}
+{{- range list "cursor" "claude" "codex" "uv" }}
+{{-   writeToStdout (printf "  %s %s\n" (ternary "✓" "✗" (ne (lookPath .) "")) .) }}
+{{- end }}
+{{- /* CI runners lack scoop/brew on PATH; only real machines stop here. */ -}}
+{{- if and $missing (not (env "CI")) }}
+{{-   writeToStdout "\nInstall the missing prerequisites (see README), then run `chezmoi init` again.\n" }}
+{{-   exit 1 }}
+{{- end }}
+
+{{- /* 2. Git identity. */ -}}
+{{- if not (hasKey . "email") }}
+{{-   writeToStdout "\nGit identity: written to ~/.gitconfig as the author of your commits.\n" }}
+{{-   writeToStdout "Use an email GitHub knows (or your GitHub noreply address) so commits link to you.\n" }}
+{{- end }}
+{{- $name  := promptStringOnce . "name"  "Git name" -}}
+{{- $email := promptStringOnce . "email" "Git email" -}}
+
+{{- /* 3. Packages: shown as "name  description", saved as names only. */ -}}
+{{- $labels := list -}}
+{{- range (include ".chezmoidata/packages.toml" | fromToml).catalog }}
+{{-   $labels = append $labels (printf "%-18s %s" .name .desc) }}
+{{- end }}
+{{- if not (hasKey . "packages") }}
+{{-   writeToStdout (printf "\nPackages: installed with %s on `chezmoi apply`. All ticked; untick what you don't want.\n" (ternary "scoop" "brew" $win)) }}
+{{- end }}
+{{- $packages := list -}}
+{{- range promptMultichoiceOnce . "packages" "Packages" $labels $labels }}
+{{-   $packages = append $packages (first (splitList " " .)) }}
+{{- end }}
+
+# Use this clone in place (`chezmoi init --source .`), so later commands find it.
+sourceDir = {{ .chezmoi.workingTree | quote }}
+
+[data]
+    name     = {{ $name  | quote }}
+    email    = {{ $email | quote }}
+    packages = {{ $packages | toToml }}
+{{ if $win }}
+# Bypass is scoped to chezmoi's own scripts, so they run even under a stricter
+# machine/GPO execution policy.
+[interpreters.ps1]
+    command = "pwsh"
+    args    = ["-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass"]
+{{- end }}

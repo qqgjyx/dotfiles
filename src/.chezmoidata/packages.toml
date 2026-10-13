@@ -1,0 +1,14 @@
+# Package tick list. `chezmoi init` offers every entry (all ticked); picks are saved
+# as `packages` in ~/.config/chezmoi/chezmoi.toml.
+# - scoop/brew: one or more packages, space-separated; scoop "bucket/name" adds the
+#   bucket. An entry without brew is Windows-only (skipped elsewhere), and vice versa.
+# - scoop_post: commands run after the scoop installs (e.g. one-time tool settings).
+# - desc is shown next to the name in the tick list (no "/" in it: it separates picks).
+catalog = [
+  { name = "starship",          desc = "shell prompt: git status, python env",  scoop = "starship",                    brew = "starship" },
+  { name = "zoxide",            desc = "smarter cd: `z proj` jumps there",      scoop = "zoxide",                      brew = "zoxide" },
+  { name = "eza",               desc = "modern ls, powers ll, la, lt",          scoop = "eza",                         brew = "eza" },
+  { name = "gh",                desc = "GitHub CLI: auth, repos, PRs",          scoop = "gh",                          brew = "gh" },
+  { name = "jetbrains-mono-nf", desc = "terminal and editor font with icons",   scoop = "nerd-fonts/JetBrainsMono-NF", brew = "font-jetbrains-mono-nerd-font", cask = true },
+  { name = "latex",             desc = "MiKTeX + Perl on Windows, MacTeX on Mac", scoop = "miktex perl",                brew = "mactex",                        cask = true, scoop_post = ["initexmf --set-config-value=[MPM]AutoInstall=1"] },  # install missing LaTeX packages silently
+]
