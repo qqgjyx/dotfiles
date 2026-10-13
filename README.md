@@ -14,6 +14,7 @@ My config for Windows · macOS · Linux, managed by [chezmoi](https://www.chezmo
 | [Claude Code](https://code.claude.com/docs/en/setup) | `irm https://claude.ai/install.ps1 \| iex` | `curl -fsSL https://claude.ai/install.sh \| bash` |
 | [Codex](https://github.com/openai/codex) | `irm https://chatgpt.com/codex/install.ps1 \| iex` | `curl -fsSL https://chatgpt.com/codex/install.sh \| sh` |
 | [uv](https://docs.astral.sh/uv/) | `irm https://astral.sh/uv/install.ps1 \| iex` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+| TeX Live (full) | [install-tl-windows.exe](https://tug.org/texlive/windows.html) | [MacTeX](https://tug.org/mactex/) / [install-tl](https://tug.org/texlive/quickinstall.html) |
 
 **2. Dotfiles.** Clone outside OneDrive/iCloud; synced cloud files break chezmoi.
 
@@ -38,7 +39,7 @@ chezmoi init --source . && chezmoi diff && chezmoi apply
 
 | | |
 |---|---|
-| Packages ([list](src/.chezmoidata/packages.toml)) | starship, zoxide, eza, gh, JetBrains Mono NF, LaTeX: scoop on Windows, brew elsewhere |
+| Packages ([list](src/.chezmoidata/packages.toml)) | starship, zoxide, eza, gh, JetBrains Mono NF: scoop on Windows, brew elsewhere |
 | Shell | pwsh profile (Windows), `.zshrc` (macOS/Linux), starship prompt |
 | Git | `.gitconfig`, `.gitignore_global` |
 | Editors / AI | Cursor settings + extensions, Claude Code `CLAUDE.md` + `settings.json` |
