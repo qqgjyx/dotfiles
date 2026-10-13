@@ -1,0 +1,11 @@
+{{- if eq .chezmoi.os "windows" -}}
+# One-time machine settings that need admin: start ssh-agent at boot, enable
+# Windows sudo (inline). Checks first, so re-runs never prompt for UAC.
+$agent = Get-Service ssh-agent
+$sudo  = (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Sudo -ErrorAction SilentlyContinue).Enabled
+if ($agent.StartType -eq 'Automatic' -and $agent.Status -eq 'Running' -and $sudo -eq 3) { return }
+
+Write-Host 'admin: enabling ssh-agent + sudo (one UAC prompt)'
+Start-Process pwsh -Verb RunAs -Wait -ArgumentList '-NoProfile', '-Command',
+    'Set-Service ssh-agent -StartupType Automatic; Start-Service ssh-agent; sudo config --enable normal'
+{{- end }}
