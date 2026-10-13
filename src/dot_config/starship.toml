@@ -6,7 +6,7 @@ command_timeout = 1000
 
 format = """
 $directory$git_branch$git_status$git_state\
-$python$nodejs$rust$golang$java\
+$python\
 $cmd_duration\
 $line_break\
 $character"""
@@ -14,7 +14,6 @@ $character"""
 [character]
 success_symbol = "[❯](bold green)"
 error_symbol   = "[❯](bold red)"
-vimcmd_symbol  = "[❮](bold yellow)"
 
 [directory]
 truncation_length = 3
@@ -43,40 +42,8 @@ min_time = 2_000
 format   = "[ took $duration]($style) "
 style    = "yellow"
 
-# Language modules — only show when the project actually uses them
+# Python — only shows inside a Python project; venv name only when one is active
 [python]
-format = "[ via $symbol${pyv_version}\\(${virtualenv}\\)]($style)"
+format = "[ via $symbol$version( \\($virtualenv\\))]($style)"
 symbol = " "
 style  = "yellow"
-
-[nodejs]
-format = "[ via $symbol$version]($style)"
-symbol = " "
-
-[rust]
-format = "[ via $symbol$version]($style)"
-symbol = " "
-
-[golang]
-format = "[ via $symbol$version]($style)"
-symbol = " "
-
-[java]
-format = "[ via $symbol$version]($style)"
-symbol = " "
-
-# Disable noisy modules
-[aws]
-disabled = true
-
-[gcloud]
-disabled = true
-
-[azure]
-disabled = true
-
-[kubernetes]
-disabled = true
-
-[hostname]
-disabled = true
