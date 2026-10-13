@@ -1,0 +1,14 @@
+{{- if eq .chezmoi.os "windows" -}}
+# Point $PROFILE (wherever Documents lives, e.g. OneDrive) at the real profile in
+# ~/.config/powershell. Writes the stub only when it differs.
+$stub = @'
+# Managed by dotfiles: loads the real profile from ~/.config/powershell.
+$p = "$HOME\.config\powershell\profile.ps1"; if (Test-Path $p) { . $p }
+'@
+$current = Get-Content $PROFILE -Raw -ErrorAction SilentlyContinue
+if ($current -ne $stub) {
+    if ($current) { Write-Host "pwsh-profile: replacing existing $PROFILE" }
+    New-Item -ItemType Directory -Force (Split-Path $PROFILE) | Out-Null
+    Set-Content -Path $PROFILE -Value $stub -NoNewline
+}
+{{- end }}

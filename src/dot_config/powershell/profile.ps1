@@ -1,4 +1,5 @@
-{{- /* ~\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 — PowerShell 7 daily-driver profile */ -}}
+# ~/.config/powershell/profile.ps1 — PowerShell 7 daily-driver profile.
+# Loaded by a stub at $PROFILE (see .chezmoiscripts/run_onchange_after_pwsh-profile.ps1.tmpl).
 # vim:ft=ps1
 
 # --- PSReadLine (autosuggest + syntax HL + history search) -------------------
@@ -13,18 +14,6 @@ Set-PSReadLineOption -PredictionViewStyle InlineView
 Set-PSReadLineKeyHandler -Key Tab          -Function MenuComplete
 Set-PSReadLineKeyHandler -Key UpArrow      -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow    -Function HistorySearchForward
-
-# --- posh-git (git integration in prompt + tab completion) -------------------
-# `Import-Module posh-git` is ~390ms cold — by far the heaviest item in this
-# profile. Defer until the user actually runs git: stub a `git` function that,
-# on first call, removes itself, imports posh-git, and re-invokes git for real.
-# Defined unconditionally (no ~26ms Get-Module -ListAvailable probe); the import
-# is best-effort so a missing posh-git still falls through to real git.
-function global:git {
-    Remove-Item Function:git -Force
-    Import-Module posh-git -ErrorAction SilentlyContinue
-    & git @args
-}
 
 # --- Tool init (cached) -----------------------------------------------------
 # `& <tool> init powershell` spawns a subprocess on every shell start.
@@ -64,15 +53,6 @@ if (-not (Test-Path $_initCacheDir)) {
 # `--print-full-init` at runtime. Cache the full init so we save *both* hops.
 _UseCachedInit -Tool 'starship' -InitArgs @('init','powershell','--print-full-init')      -CacheDir $_initCacheDir
 _UseCachedInit -Tool 'zoxide'   -InitArgs @('init','powershell','--cmd','z')              -CacheDir $_initCacheDir
-{{ if eq .profile "full" -}}
-# atuin only auto-initializes on the full profile (where it gets installed
-# via run_onchange). Skips ~60ms cached init + ATUIN_CONFIG_DIR setup on
-# core/dev profiles even if the binary happens to be present.
-if (Get-Command atuin -ErrorAction SilentlyContinue) {
-    $env:ATUIN_CONFIG_DIR = "$HOME\.config\atuin"
-}
-_UseCachedInit -Tool 'atuin'    -InitArgs @('init','powershell','--disable-up-arrow')     -CacheDir $_initCacheDir
-{{- end }}
 
 # --- Aliases -----------------------------------------------------------------
 # eza — `ll` is the all-purpose long lister (always includes hidden); `la`
@@ -83,18 +63,15 @@ _UseCachedInit -Tool 'atuin'    -InitArgs @('init','powershell','--disable-up-ar
 # Windows Terminal Ctrl+click filenames to open them; --total-size shows
 # recursive directory sizes (slow on huge trees like node_modules — bypass
 # with `eza --long ...` if it ever bites).
-# Defined unconditionally (no ~17ms Get-Command probe each); eza and bat are
-# always present on this box. If either is uninstalled its command errors at call
-# time (and `cat` would resolve to nothing; reinstall bat or drop the alias).
+# Defined unconditionally (no ~17ms Get-Command probe); if eza is uninstalled
+# these error at call time.
 function ll { eza --icons --git --long --all --group-directories-first --smart-group --total-size --color-scale=all --hyperlink @args }
 Set-Alias -Name la -Value ll
 function lt { eza --icons --tree --level=2 --git-ignore @args }
-# bat
-Set-Alias -Name cat -Value bat -Option AllScope
-# chezmoi
-function cma { chezmoi apply @args }
-function cmd { chezmoi diff @args }
-function cme { chezmoi edit @args }
+# chezmoi (cz*, so nothing shadows cmd.exe)
+function cza { chezmoi apply @args }
+function czd { chezmoi diff @args }
+function cze { chezmoi edit @args }
 # git short
 # PowerShell ships built-in aliases (e.g. gp -> Get-ItemProperty) that resolve
 # before user-defined functions. Drop the conflicts before defining ours.

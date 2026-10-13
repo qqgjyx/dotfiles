@@ -10,7 +10,7 @@
 install-cursor.sh
 install-packages.sh
 {{- else }}
-Documents/PowerShell/**
+.config/powershell/**
 install-cursor.ps1
 install-packages.ps1
 {{- end }}
