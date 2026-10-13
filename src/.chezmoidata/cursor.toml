@@ -7,10 +7,9 @@
         "charliermarsh.ruff",
         "ms-toolsai.jupyter",
         "alefragnani.project-manager",
-        "usernamehw.errorlens",
-        "editorconfig.editorconfig",
         "yzhang.markdown-all-in-one",
-        "streetsidesoftware.code-spell-checker",
         "MS-CEINTL.vscode-language-pack-zh-hans",
         "james-yu.latex-workshop",
+        "tomoki1207.pdf",
+        "wayou.vscode-todo-highlight",
     ]
