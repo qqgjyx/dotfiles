@@ -38,7 +38,7 @@ chezmoi init --source . && chezmoi diff && chezmoi apply
 
 | | |
 |---|---|
-| Packages ([list](src/.chezmoidata/packages.toml)) | starship, zoxide, eza, gh, JetBrains Mono NF, LaTeX (MiKTeX + Perl, Windows): scoop on Windows, brew elsewhere |
+| Packages ([list](src/.chezmoidata/packages.toml)) | starship, zoxide, eza, gh, JetBrains Mono NF, LaTeX (MiKTeX + Perl; MacTeX on Mac): scoop on Windows, brew elsewhere |
 | Shell | pwsh profile (Windows), `.zshrc` (macOS/Linux), starship prompt |
 | Git | `.gitconfig`, `.gitignore_global` |
 | Editors / AI | Cursor settings + extensions, Claude Code `CLAUDE.md` + `settings.json` |

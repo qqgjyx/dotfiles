@@ -9,5 +9,5 @@ catalog = [
   { name = "eza",               desc = "modern ls, powers ll, la, lt",          scoop = "eza",                         brew = "eza" },
   { name = "gh",                desc = "GitHub CLI: auth, repos, PRs",          scoop = "gh",                          brew = "gh" },
   { name = "jetbrains-mono-nf", desc = "terminal and editor font with icons",   scoop = "nerd-fonts/JetBrainsMono-NF", brew = "font-jetbrains-mono-nerd-font", cask = true },
-  { name = "latex",             desc = "MiKTeX + Perl for latexmk (Windows)",   scoop = "miktex perl" },
+  { name = "latex",             desc = "MiKTeX + Perl on Windows, MacTeX on Mac", scoop = "miktex perl",                brew = "mactex",                        cask = true },
 ]
