@@ -1,5 +1,6 @@
 {
   "autoUpdatesChannel": "latest",
+  "theme": "auto",
   "skipDangerousModePermissionPrompt": true,
   "skipAutoPermissionPrompt": true,
   "permissions": {
