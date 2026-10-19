@@ -41,7 +41,7 @@ chezmoi init --source . && chezmoi diff && chezmoi apply
 | Packages ([list](src/.chezmoidata/packages.toml)) | starship, zoxide, eza, gh, JetBrains Mono NF, LaTeX (MiKTeX + Perl; MacTeX on Mac): scoop on Windows, brew elsewhere |
 | Shell | pwsh profile (Windows), `.zshrc` (macOS/Linux), starship prompt |
 | Git | `.gitconfig`, `.gitignore_global` |
-| Editors / AI | Cursor settings + extensions, Claude Code `CLAUDE.md` + `settings.json` |
+| Editors / AI | Cursor settings + extensions, Claude Code `settings.json` |
 
 `src/` mirrors `~` (e.g. `src/dot_gitconfig.tmpl` → `~/.gitconfig`).
 
@@ -52,7 +52,3 @@ chezmoi diff / apply      # preview / apply config changes   (aliases: czd / cza
 scoop update * / brew upgrade
 git pull && chezmoi apply # sync another machine
 ```
-
----
-
-`src/dot_claude/CLAUDE.md` is vendored from [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills). MIT license.
