@@ -63,6 +63,18 @@
 	last = log -1 HEAD --stat
 	amend = commit --amend --no-edit
 	undo = reset --soft HEAD~1
+{{- /* GitHub HTTPS auth via gh: what `gh auth setup-git` writes, kept here so
+       apply doesn't drop it. Ticked package or already on PATH. */}}
+{{- if or (has "gh" .packages) (lookPath "gh") }}
+
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential
+{{- end }}
 
 [help]
 	autocorrect = prompt
