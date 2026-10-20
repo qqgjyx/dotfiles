@@ -9,8 +9,9 @@ setopt extended_history hist_expire_dups_first hist_ignore_dups
 setopt hist_ignore_space hist_verify inc_append_history share_history
 
 # --- Homebrew (macOS: /opt/homebrew or /usr/local, Linux: linuxbrew) ---------
+# -O: only a brew we own; shared machines can have someone else's stale one.
 for _brew in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
-    [[ -x $_brew ]] && { eval "$($_brew shellenv)"; break; }
+    [[ -x $_brew && -O $_brew ]] && { eval "$($_brew shellenv)"; break; }
 done
 unset _brew
 
