@@ -2,14 +2,21 @@
        re-ask with `chezmoi init --prompt`. */ -}}
 {{- $win := eq .chezmoi.os "windows" -}}
 
-{{- /* 1. Check prerequisites (required; stop if missing) and Tier 1 (recommended). */ -}}
-{{- $prereqs := list "git" (ternary "scoop" "brew" $win) -}}
-{{- if $win }}{{ $prereqs = append $prereqs "pwsh" }}{{ end -}}
+{{- /* 1. Check prerequisites (required; stop if missing) and Tier 1 (recommended).
+       brew is optional on Linux: shared machines (HPC clusters) often can't have one. */ -}}
+{{- $linux := eq .chezmoi.os "linux" -}}
+{{- $prereqs := list "git" -}}
+{{- if $win }}{{ $prereqs = concat $prereqs (list "scoop" "pwsh") }}
+{{- else if not $linux }}{{ $prereqs = append $prereqs "brew" }}{{ end -}}
 {{- $missing := list -}}
 {{- writeToStdout "\nPrerequisites (required)\n" -}}
 {{- range $prereqs }}
 {{-   if lookPath . }}{{ writeToStdout (printf "  ✓ %s\n" .) }}
 {{-   else }}{{ writeToStdout (printf "  ✗ %s\n" .) }}{{ $missing = append $missing . }}{{ end }}
+{{- end }}
+{{- if $linux }}
+{{-   if lookPath "brew" }}{{ writeToStdout "  ✓ brew\n" }}
+{{-   else }}{{ writeToStdout "  - brew (optional on Linux; without it, install packages by hand: see README)\n" }}{{ end }}
 {{- end }}
 {{- writeToStdout "Tier 1 (official installers, see README; fine to add later)\n" -}}
 {{- range list "cursor" "claude" "codex" "uv" }}

@@ -31,6 +31,11 @@ brew install chezmoi
 chezmoi init --source . && chezmoi diff && chezmoi apply
 ```
 
+**Linux without brew** (shared/HPC machines, no sudo): same steps, skipping `brew install chezmoi`.
+Put static binaries in `~/.local/bin` instead: `sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin`,
+plus the musl/linux-amd64 release tarballs of starship, zoxide, eza and gh from GitHub. `apply` clones
+antidote into `~/.antidote` and lists any ticked package still missing.
+
 `init` asks for your git name, email and packages (all ticked; re-ask with `chezmoi init --prompt`).
 `apply` installs the packages, writes the configs and, on Windows, enables ssh-agent + `sudo` (one UAC prompt).
 
