@@ -6,7 +6,7 @@
        brew is optional on Linux: shared machines (HPC clusters) often can't have one. */ -}}
 {{- $linux := eq .chezmoi.os "linux" -}}
 {{- $prereqs := list "git" -}}
-{{- if $win }}{{ $prereqs = append $prereqs "scoop" "pwsh" }}
+{{- if $win }}{{ $prereqs = concat $prereqs (list "scoop" "pwsh") }}
 {{- else if not $linux }}{{ $prereqs = append $prereqs "brew" }}{{ end -}}
 {{- $missing := list -}}
 {{- writeToStdout "\nPrerequisites (required)\n" -}}
