@@ -20,11 +20,12 @@ typeset -U path
 path=("$HOME/.local/bin" "$HOME/bin" $path)
 export PATH
 
-# --- Plugins (antidote, installed by brew) -----------------------------------
-if [[ -n $HOMEBREW_PREFIX && -e $HOMEBREW_PREFIX/opt/antidote/share/antidote/antidote.zsh ]]; then
-    source "$HOMEBREW_PREFIX/opt/antidote/share/antidote/antidote.zsh"
-    antidote load "$HOME/.zsh_plugins.txt"
-fi
+# --- Plugins (antidote: from brew, else a git clone in ~/.antidote) ----------
+for _antidote in ${HOMEBREW_PREFIX:+$HOMEBREW_PREFIX/opt/antidote/share/antidote/antidote.zsh} \
+                 "$HOME/.antidote/antidote.zsh"; do
+    [[ -e $_antidote ]] && { source "$_antidote"; antidote load "$HOME/.zsh_plugins.txt"; break; }
+done
+unset _antidote
 
 # --- Tool init ---------------------------------------------------------------
 command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"

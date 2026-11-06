@@ -2,7 +2,11 @@
 #!/bin/sh
 # Install ticked packages via brew. Re-runs when the selection changes; brew skips
 # anything already installed. Casks are macOS-only, so Linux skips them.
+# Without brew (Linux only; init requires it elsewhere): clone antidote and list the
+# ticked packages to install by hand. The lookPath result is part of this script's
+# content, so it re-runs once brew appears on PATH.
 {{ template "step.sh" }}
+{{- if lookPath "brew" }}
 step brew install antidote   # zsh plugin manager, needed by .zshrc
 {{- range .catalog }}{{ if has .name $.packages }}
 {{-   if not (hasKey . "brew") }}
@@ -15,5 +19,12 @@ step brew install --cask {{ .brew }}
 echo "skip {{ .name }}: no brew casks on Linux"
 {{-   end }}
 {{- end }}{{ end }}
+{{- else }}
+echo "no brew: zsh plugins via a git clone of antidote, other packages by hand (see README)"
+[ -d "$HOME/.antidote" ] || step git clone --depth=1 https://github.com/mattmc3/antidote.git "$HOME/.antidote"
+{{- range .catalog }}{{ if and (has .name $.packages) (hasKey . "brew") (not (dig "cask" false .)) }}
+command -v {{ .name }} >/dev/null 2>&1 || echo "  install by hand: {{ .name }}"
+{{- end }}{{ end }}
+{{- end }}
 finish
 {{- end }}
